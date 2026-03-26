@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="Barney">
 <meta name="theme-color" content="#3730A3">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%233730A3'/%3E%3Ctext y='125' x='90' text-anchor='middle' font-size='100'%3E🐾%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAEM0lEQVR4nO3ZQZITQQxE0TkSuzkwBzULEw5gnINdrVKqpJ/x1+0e9WPFx+ePn0RP+7C/AZUNHCQDB8nAQTJwkAwcJAMHycBBMnCQDBwkAwfJwEEycJAMHCQDB8nAQTJwkAwcJAMHycBBMnCQDBwkAwfJwEEycJAMHCQDB8nAQTJwkAwcJAMHycBBMnCQDBwkA8df3W43+zvUaTSO22uzv6eroTheZDGcyDgcCyzGEhmE4yKLgUSm4AiUMcfHCBzhMob46I9jk4wJPprj2CqjvY/OOBJk9PYBDnDI2uJIk9HYBzjAIeuJI1lGVx+lcSxf/CAclVUVwhH1DXYCSHo3+7cohCP2Myw8LWppf+MIHDs+xsVnVnufiThCPsbT8wU+uc6bDMIReLWvtwt/eJHXGIEj/Gr/3G7T8yu8Q3Mcm672uN3W51d4h7Y4tl7tcbuEX/H+ekMcCVebM3AwuVY43MdsOHAwuSY43GdsO3AwueNxuA/YfOBgcuBgcuBgcuBgcuBYP1ybX/nm10/FYbza43ZHP//FdzgSR5F/VYc+/613AMf64c56+NprgGP9cEc8+eKbgOPS4Qo+M/x9wHHpcPanRQ0c8YezPy1qZ+Nw3W7ra5T9G8Hx3uEa/Mp/f/1gHPm3S/5R498IDvZkfXDgI3Y5nwwcR64PDvcluy3t33Pz/5XttzQZG3G4b9hzmTJ24XDfsOeSZWzB4b5hz+XLiMfhvmHDWVjE43CfsduMLMBRd3YWwThyzrTpVzL39S+yIwBHldk/eTaOnGtu/ZXM2b96NxxbfyJ/9g8Pjrqzf/g+OLY+3zX7twdH3dm/fQYO95EPnv3zb8eBj+XZPz84Ss8uABx1ZxcAjrqzCwBH6dkR7MWBjyuzIwBH3dkRbMeBj+XZEYCj9OwOtuPAx/LsDjJwRPmY5szuIAnH9e8aiOyU2R3k4bjyaaOEnTW7g1QcCx84iteJszsw4HjxM1+HdfrsDmw4vn71EFKdZndQBQcyns5+82NwTPNhvzY46s5+bXDUnf3a4Kg7+7XBUXf2a4Oj7uzXBkfd2a8NjrqzX/swHHN82O8Mjrqz3xkcdWe/Mzjqzn7nI3FM8GG/MDjqzn5hcNSd/cIH4+jtw35bcNSd/bbH4+jqw35VcNSd/apNcPTzYb8nOOrOfs9WODr5sF+yIY4ePuw3BEfd2W/YFsfpPuzXa47jXB/2u43AcaIP+8UG4TjLh/1W43Cc4sN+paE46vuw32c0jso+7Je5WAccnyV92G9yvSY47rk9/J79DlG1wvFZwIf9AoF1w3EPFiH1xHEPFhfrjOMeLJbrj+MRJt5tEI4/A8QrDcWhmolABQ6SgYNk4CAZOEgGDpKBg2TgIBk4SAYOkoGDZOAgGThIBg6SgYNk4CAZOEgGDpKBg2TgIBk4SAYOkoGDZOAgGThI9gvyBQ7O1iUFEAAAAABJRU5ErkJggg==">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script type="module">
 import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
@@ -513,6 +513,7 @@ textarea{resize:vertical;min-height:60px;}
   <div class="week-card"><div class="week-title">This week</div><div class="week-days" id="wsDays"></div></div>
   <div class="partner-card"><div class="pc-title">Today — both trainers</div><div id="partnerLog"></div></div>
   <div class="hist-card"><div class="hist-title">Recent history</div><div id="recentLog"></div></div>
+  <button onclick="exportCSV()" style="width:100%;padding:14px;border:1px solid var(--sep);border-radius:var(--r2);background:var(--card);font-family:'Inter',sans-serif;font-size:15px;font-weight:600;color:var(--t2);cursor:pointer;margin-top:4px;">⬇️ Export all data as CSV</button>
 </div>
 
 <div class="page" id="page-wins">
@@ -1243,6 +1244,36 @@ function renderAICard(data){
     <div class="ai-title">${data.emoji} ${data.title}</div>
     <div class="ai-body">${data.body}</div>
   </div>`;
+}
+
+// EXPORT
+function exportCSV(){
+  const rows=[['Date','Time','Type','Detail','Notes','Who']];
+  const sess=allData.sessions||[],cr=allData.crate||[],soc=allData.social||[];
+  const toilet=allData.toilet||{},ms=allData.milestones||{};
+
+  sess.forEach(s=>rows.push([fmtD(s.ts),fmt(s.ts),'Session',s.actName,s.notes||'',s.who||'']));
+  cr.forEach(s=>rows.push([fmtD(s.ts),fmt(s.ts),'Crate',`${s.dur} — ${s.settled}`,s.notes||'',s.who||'']));
+  soc.forEach(s=>rows.push([fmtD(s.ts),fmt(s.ts),'Outing',`${s.loc} — ${s.reaction}`,s.notes||'',s.who||'']));
+
+  Object.entries(toilet).forEach(([day,entries])=>{
+    (entries||[]).forEach(e=>rows.push([day,e.time,'Toilet',e.type,'','']));
+  });
+
+  Object.entries(ms).forEach(([id,m])=>{
+    const milestone=milestones.find(x=>x.id===id);
+    if(milestone)rows.push([m.date,'','Milestone',milestone.t,m.note||'',m.who||'']);
+  });
+
+  rows.sort((a,b)=>a[0]>b[0]?1:-1);
+
+  const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`barney-training-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  toast('⬇️ CSV downloaded!');
 }
 
 async function init(){
