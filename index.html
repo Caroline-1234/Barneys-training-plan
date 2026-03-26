@@ -11,6 +11,19 @@
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%233730A3'/%3E%3Ctext y='125' x='90' text-anchor='middle' font-size='100'%3E🐾%3C/text%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script type="module">
+import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import{getFirestore,doc,setDoc,getDoc,onSnapshot}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+const firebaseConfig={apiKey:"AIzaSyBdgHhll9VLe4SSRxPt6EbtCxQYvJfZa_0",authDomain:"barney-training.firebaseapp.com",projectId:"barney-training",storageBucket:"barney-training.firebasestorage.app",messagingSenderId:"615276489945",appId:"1:615276489945:web:4d808d3277891e48f7a2c8"};
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
+const REF=()=>doc(db,"barney","shared");
+window.fbSave=async function(data){try{await setDoc(REF(),{payload:JSON.stringify(data)},{merge:true});return true;}catch(e){console.error("fbSave",e);return false;}};
+window.fbLoad=async function(){try{const snap=await getDoc(REF());if(snap.exists())return JSON.parse(snap.data().payload);return null;}catch(e){console.error("fbLoad",e);return null;}};
+window.fbListen=function(cb){try{return onSnapshot(REF(),snap=>{if(snap.exists())try{cb(JSON.parse(snap.data().payload));}catch{}});}catch(e){return()=>{};}};
+window.fbReady=true;
+document.dispatchEvent(new Event("fbReady"));
+</script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 :root{
@@ -606,23 +619,54 @@ const fmt=ts=>new Date(ts).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-
 const fmtD=ts=>new Date(ts).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
 const fmtDT=ts=>`${fmtD(ts)} ${fmt(ts)}`;
 
-// STORAGE — safe wrapper for window.storage (only available in Claude.ai context)
+// STORAGE — Firebase primary, localStorage fallback
 const hasCloudStorage=()=>typeof window!=='undefined'&&window.storage&&typeof window.storage.get==='function';
+let fbUnsubscribe=null;
 
 function saveLocal(){try{localStorage.setItem('barneyV4',JSON.stringify(allData));}catch{}}
 function loadLocal(){try{const v=localStorage.getItem('barneyV4');if(v)allData=JSON.parse(v);}catch{}}
+
 async function cloudLoad(){
   setSS('spin','Syncing...');
-  if(!hasCloudStorage()){setSS('ok','✓ Local');return;}
-  try{const r=await window.storage.get('barney_v4',true);if(r&&r.value)try{mergeData(JSON.parse(r.value));}catch{}setSS('ok','✓ Synced');}
-  catch{setSS('err','Offline — saved locally');}
+  // Try Firebase first
+  if(window.fbReady){
+    try{
+      const remote=await window.fbLoad();
+      if(remote)mergeData(remote);
+      saveLocal();
+      setSS('ok','✓ Synced');
+      // Start live listener so changes from other device appear instantly
+      if(fbUnsubscribe)fbUnsubscribe();
+      fbUnsubscribe=window.fbListen(remote=>{
+        mergeData(remote);saveLocal();
+        renderToday();renderDash();renderMilestones();
+      });
+      return;
+    }catch(e){console.error('cloudLoad firebase',e);}
+  }
+  // Fall back to window.storage (Claude.ai context)
+  if(hasCloudStorage()){
+    try{const r=await window.storage.get('barney_v4',true);if(r&&r.value)mergeData(JSON.parse(r.value));setSS('ok','✓ Synced');return;}
+    catch{}
+  }
+  setSS('err','Offline — saved locally');
 }
+
 async function cloudSave(){
   saveLocal();
-  if(!hasCloudStorage()){setSS('ok','✓ Saved locally');return;}
-  setSS('spin','Saving...');
-  try{await window.storage.set('barney_v4',JSON.stringify(allData),true);setSS('ok','✓ Saved');}
-  catch{setSS('err','Saved locally only');}
+  // Try Firebase first
+  if(window.fbReady){
+    setSS('spin','Saving...');
+    try{await window.fbSave(allData);setSS('ok','✓ Saved');return;}
+    catch(e){console.error('cloudSave firebase',e);}
+  }
+  // Fall back to window.storage
+  if(hasCloudStorage()){
+    setSS('spin','Saving...');
+    try{await window.storage.set('barney_v4',JSON.stringify(allData),true);setSS('ok','✓ Saved');return;}
+    catch{}
+  }
+  setSS('err','Saved locally only');
 }
 function mergeData(r){
   ['sessions','crate','social'].forEach(k=>{const l=allData[k]||[],rem=r[k]||[],ts=new Set(l.map(x=>x.ts));rem.forEach(x=>{if(!ts.has(x.ts))l.push(x);});allData[k]=l.sort((a,b)=>b.ts-a.ts);});
@@ -1203,6 +1247,13 @@ function renderAICard(data){
 
 async function init(){
   loadLocal();
+  // Wait for Firebase module to initialise (it loads async as ES module)
+  if(!window.fbReady){
+    await new Promise(res=>{
+      document.addEventListener('fbReady',res,{once:true});
+      setTimeout(res,3000); // max 3s wait then proceed anyway
+    });
+  }
   try{await cloudLoad();}catch{}
   document.getElementById('splash').style.opacity='0';
   setTimeout(()=>document.getElementById('splash').style.display='none',350);
