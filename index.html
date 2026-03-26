@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Barney 🐾</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Barney">
+<meta name="theme-color" content="#3730A3">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%233730A3'/%3E%3Ctext y='125' x='90' text-anchor='middle' font-size='100'%3E🐾%3C/text%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --ind:#3730A3;--ind2:#4338CA;--ind3:#312E81;
+  --ind-bg:#EEF2FF;--ind-mid:#6366F1;
+  --bg:#F2F2F7;--card:#FFFFFF;--card2:#F9F9FB;
+  --sep:#E5E5EA;--sep2:#C7C7CC;
+  --t1:#000000;--t2:#3A3A3C;--t3:#8E8E93;--t4:#C7C7CC;
+  --green:#34C759;--gbg:#F0FBF3;--gdark:#1A7A34;
+  --red:#FF3B30;--rbg:#FFF1F0;--rdark:#C0392B;
+  --blue:#007AFF;--bbg:#EBF4FF;--bdark:#0055CC;
+  --r:14px;--r2:10px;--r3:8px;
+}
+body{background:var(--bg);font-family:'Inter',system-ui,sans-serif;color:var(--t1);padding-bottom:calc(88px + env(safe-area-inset-bottom));-webkit-font-smoothing:antialiased;}
+
+/* SPLASH */
+#splash{position:fixed;inset:0;background:var(--ind);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;transition:opacity .3s;}
+#splash .sp{font-size:56px;animation:bob 1s ease-in-out infinite alternate;}
+#splash h2{font-size:24px;font-weight:800;color:#fff;margin-top:18px;letter-spacing:-.5px;}
+#splash p{color:rgba(255,255,255,.5);font-size:15px;margin-top:6px;}
+@keyframes bob{from{transform:translateY(0)}to{transform:translateY(-8px)}}
+
+/* LOGIN */
+#login{position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:998;padding:32px 24px;}
+.login-paw{font-size:72px;margin-bottom:24px;}
+.login-title{font-size:32px;font-weight:800;letter-spacing:-.8px;margin-bottom:8px;color:var(--t1);}
+.login-sub{font-size:17px;color:var(--t3);margin-bottom:36px;text-align:center;line-height:1.5;}
+.login-btn{width:100%;background:var(--card);border:none;border-radius:var(--r);padding:18px 20px;display:flex;align-items:center;gap:16px;cursor:pointer;margin-bottom:12px;font-family:'Inter',sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.08);transition:transform .1s;}
+.login-btn:active{transform:scale(.98);}
+.login-btn .lb-av{font-size:40px;line-height:1;}
+.login-btn .lb-name{font-size:18px;font-weight:700;color:var(--t1);}
+.login-btn .lb-role{font-size:14px;color:var(--t3);margin-top:2px;}
+
+/* HEADER */
+#hdr{background:var(--ind);padding:18px 20px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:90;display:none;}
+.hdr-left{display:flex;align-items:center;gap:13px;}
+.hdr-av{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:26px;filter:brightness(0) invert(1);}
+.hdr-name{font-size:22px;font-weight:800;color:#fff;letter-spacing:-.4px;}
+.hdr-date{font-size:13px;color:rgba(255,255,255,.6);margin-top:2px;}
+.hdr-right{display:flex;gap:8px;align-items:center;}
+.age-pill{background:rgba(255,255,255,.95);color:var(--ind);font-size:13px;font-weight:700;padding:7px 14px;border-radius:50px;}
+.user-pill{background:rgba(255,255,255,.15);color:#fff;font-size:13px;font-weight:500;padding:7px 12px;border-radius:50px;border:1px solid rgba(255,255,255,.3);cursor:pointer;}
+
+/* SYNC */
+#syncBar{background:var(--ind3);padding:3px 8px 4px;text-align:center;font-size:11px;color:rgba(255,255,255,.5);display:none;}
+.dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.3);margin-right:4px;vertical-align:middle;}
+.dot.ok{background:#34C759;}.dot.spin{animation:blink .8s infinite;}.dot.err{background:#FF3B30;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* NAV */
+#nav{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--sep);display:none;padding-bottom:max(env(safe-area-inset-bottom),8px);z-index:90;}
+#nav.visible{display:flex;}
+.ntab{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 4px 7px;background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:11px;font-weight:500;color:var(--t3);gap:3px;position:relative;transition:color .12s;}
+.ntab .ni{font-size:23px;line-height:1;}
+.ntab.on{color:var(--ind);}
+.ntab.on::after{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:32px;height:3px;background:var(--ind);border-radius:0 0 4px 4px;}
+
+/* FAB */
+#fab{position:fixed;bottom:88px;right:16px;width:58px;height:58px;border-radius:50%;background:var(--ind);border:none;cursor:pointer;display:none;align-items:center;justify-content:center;font-size:32px;font-weight:300;color:#fff;line-height:1;box-shadow:0 4px 20px rgba(55,48,163,.5);z-index:89;transition:transform .12s;}
+#fab:active{transform:scale(.9);}
+
+/* PAGES */
+#app{display:none;}
+.page{display:none;padding:20px 16px 24px;}
+.page.on{display:block;}
+
+/* SECTION LABEL — consistent 24px above, 10px below */
+.sec{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--t3);margin:24px 0 10px 2px;}
+.sec:first-child{margin-top:0;}
+
+/* STAGE BANNER */
+.stage-banner{background:var(--ind);border-radius:var(--r);padding:24px;margin-bottom:16px;color:#fff;position:relative;overflow:hidden;}
+.stage-banner::after{content:'🐾';position:absolute;right:-4px;top:-4px;font-size:100px;opacity:.08;pointer-events:none;filter:brightness(0) invert(1);}
+.sb-tag{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;opacity:.65;margin-bottom:10px;}
+.sb-title{font-size:30px;font-weight:800;letter-spacing:-.6px;line-height:1.1;margin-bottom:10px;}
+.sb-sub{font-size:15px;opacity:.8;line-height:1.55;margin-bottom:14px;}
+.sb-warn{background:rgba(255,255,255,.12);border-radius:var(--r3);padding:12px 14px;font-size:14px;line-height:1.55;}
+
+/* TIP */
+.tip-card{background:var(--ind-bg);border-radius:var(--r);padding:18px 20px;margin-bottom:16px;display:flex;gap:14px;align-items:flex-start;}
+.tip-icon{font-size:26px;flex-shrink:0;margin-top:2px;}
+.tip-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--ind);margin-bottom:6px;}
+.tip-text{font-size:16px;color:var(--t1);line-height:1.55;font-weight:500;}
+
+/* AI CHALLENGE CARD */
+.ai-card{background:var(--card);border-radius:var(--r);padding:18px 20px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,.07);border-left:4px solid var(--ind-mid);}
+.ai-card-loading{display:flex;align-items:center;gap:12px;color:var(--t3);font-size:14px;}
+.ai-card-loading .ai-spin{width:18px;height:18px;border:2px solid var(--sep);border-top-color:var(--ind);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ai-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--ind-mid);margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+.ai-label span{background:var(--ind-bg);color:var(--ind);font-size:10px;padding:2px 7px;border-radius:50px;font-weight:700;}
+.ai-title{font-size:17px;font-weight:700;color:var(--t1);margin-bottom:6px;line-height:1.3;}
+.ai-body{font-size:15px;color:var(--t2);line-height:1.6;}
+.ai-retry{margin-top:10px;background:none;border:1px solid var(--sep);border-radius:var(--r3);padding:7px 14px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:var(--t3);cursor:pointer;}
+
+/* SESSION PROGRESS BAR */
+.sess-progress{background:var(--card);border-radius:var(--r);padding:16px 18px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.07);}
+.sess-prog-bar{height:6px;background:var(--sep);border-radius:50px;overflow:hidden;margin-bottom:10px;}
+.sess-prog-fill{height:100%;background:var(--ind);border-radius:50px;transition:width .4s;}
+.sess-prog-label{font-size:15px;font-weight:600;color:var(--t2);}
+
+/* TOP TIMER BUTTON */
+.sc-top-btns{margin-bottom:16px;}
+.btn-timer-top{width:100%;padding:14px;border:none;border-radius:var(--r2);background:var(--ind);color:#fff;font-family:'Inter',sans-serif;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
+
+/* SECONDARY DETAIL TOGGLE */
+.sc-secondary-toggle{padding:16px 0 8px;font-size:14px;font-weight:600;color:var(--ind);cursor:pointer;text-align:center;}
+.sc-secondary{display:none;}
+.sc-secondary.open{display:block;}
+
+/* PARTNER STRIP ON TODAY */
+.partner-strip{background:var(--ind-bg);border-radius:var(--r);padding:16px 18px;margin-top:12px;font-size:14px;color:var(--t2);line-height:1.6;}
+.partner-strip strong{color:var(--ind);}
+
+/* MILESTONE PROMPT */
+.milestone-prompt{background:var(--card);border-radius:var(--r);padding:16px 18px;margin-top:12px;display:flex;align-items:center;gap:12px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.07);}
+.milestone-prompt:active{background:var(--bg);}
+.mp-icon{font-size:22px;flex-shrink:0;}
+.mp-text{font-size:15px;font-weight:600;color:var(--ind);}
+
+/* SESSION CARDS */
+.scard{background:var(--card);border-radius:var(--r);margin-bottom:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.07);}
+.scard.done{background:var(--gbg);}
+.scard.done .sc-dur{color:var(--gdark);font-weight:600;}
+.sc-row{display:flex;align-items:center;gap:14px;padding:18px;cursor:pointer;min-height:82px;}
+.sc-icon{width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.sc-info{flex:1;min-width:0;}
+.sc-tag{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--t3);margin-bottom:4px;}
+.sc-name{font-size:16px;font-weight:700;color:var(--t1);line-height:1.2;margin-bottom:3px;}
+.sc-dur{font-size:13px;color:var(--t3);}
+.sc-right{display:flex;flex-direction:column;align-items:center;justify-content:space-between;flex-shrink:0;align-self:stretch;padding:4px 0;}
+.sc-tick{width:28px;height:28px;border-radius:50%;border:2px solid var(--sep2);background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .2s;flex-shrink:0;}
+.scard.done .sc-tick{background:var(--green);border-color:var(--green);color:#fff;}
+.sc-chev{font-size:14px;color:var(--t3);transition:transform .2s;flex-shrink:0;}
+.sc-chev.open{transform:rotate(180deg);}
+.sc-detail{display:none;border-top:1px solid var(--sep);}
+.sc-detail.open{display:block;}
+.sc-pad{padding:20px;}
+.sc-outcome{background:var(--gbg);border-radius:var(--r2);padding:14px 16px;margin-bottom:20px;}
+.sc-outcome-tag{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--gdark);opacity:.75;margin-bottom:6px;}
+.sc-outcome-text{font-size:15px;color:var(--gdark);line-height:1.55;}
+.sc-h{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--t3);margin-bottom:10px;margin-top:20px;}
+.sc-h:first-child{margin-top:0;}
+.sc-why{font-size:15px;color:var(--t2);line-height:1.6;}
+.sc-steps{display:flex;flex-direction:column;gap:12px;}
+.sc-step{display:flex;gap:12px;align-items:flex-start;}
+.sc-stepn{width:24px;height:24px;border-radius:50%;background:var(--ind-bg);color:var(--ind);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+.sc-stept{font-size:15px;color:var(--t2);line-height:1.6;flex:1;}
+.sc-donot{background:var(--rbg);border-radius:var(--r2);padding:14px 16px;}
+.sc-donot ul{padding-left:18px;}
+.sc-donot li{font-size:15px;color:var(--rdark);line-height:1.9;}
+.sc-tip{background:var(--ind-bg);border-radius:var(--r2);padding:14px 16px;font-size:15px;color:var(--ind3);line-height:1.55;margin-top:16px;}
+.sc-note{width:100%;background:var(--bg);border:1px solid var(--sep);border-radius:var(--r2);padding:12px 14px;font-family:'Inter',sans-serif;font-size:16px;color:var(--t1);resize:none;min-height:60px;margin-top:16px;margin-bottom:12px;outline:none;}
+.sc-note:focus{border-color:var(--ind);}
+.sc-btns{display:flex;gap:10px;}
+.btn-done{flex:1;padding:15px;border:none;border-radius:var(--r2);background:var(--ind);color:#fff;font-family:'Inter',sans-serif;font-size:16px;font-weight:700;cursor:pointer;}
+.btn-done.undo{background:var(--bg);color:var(--t2);border:1px solid var(--sep);}
+
+/* TOILET */
+.toilet{background:var(--card);border-radius:var(--r);overflow:hidden;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.07);}
+.toilet-head{padding:16px 18px;border-bottom:1px solid var(--sep);display:flex;justify-content:space-between;align-items:center;}
+.toilet-title{font-size:16px;font-weight:600;}
+.toilet-count{font-size:13px;color:var(--t3);}
+.toilet-btns{display:flex;}
+.toilet-btn{flex:1;padding:18px;border:none;background:none;font-family:'Inter',sans-serif;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;border-right:1px solid var(--sep);}
+.toilet-btn:last-child{border-right:none;}
+.toilet-btn .ti{font-size:30px;}
+.toilet-btn .tl{font-size:12px;text-transform:uppercase;letter-spacing:.3px;}
+.toilet-btn.out{color:var(--gdark);}
+.toilet-btn.out:active{background:var(--gbg);}
+.toilet-btn.acc{color:var(--rdark);}
+.toilet-btn.acc:active{background:var(--rbg);}
+.toilet-log{padding:12px 18px;font-size:13px;color:var(--t3);line-height:2;max-height:72px;overflow-y:auto;background:var(--card2);}
+
+/* CHECKLIST */
+.checklist{background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.07);margin-bottom:12px;}
+.cl-row{display:flex;align-items:center;gap:14px;padding:16px 18px;border-bottom:1px solid var(--sep);cursor:pointer;min-height:60px;}
+.cl-row:last-child{border-bottom:none;}
+.cl-row:active{background:var(--card2);}
+.cl-icon{font-size:20px;width:28px;text-align:center;flex-shrink:0;}
+.cl-label{flex:1;font-size:16px;font-weight:500;color:var(--t1);}
+.cl-tick{width:24px;height:24px;border-radius:50%;border:2px solid var(--sep2);background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;transition:all .2s;}
+.cl-row.done .cl-label{color:var(--t3);}
+.cl-row.done .cl-tick{background:var(--green);border-color:var(--green);color:#fff;}
+
+/* OVERNIGHT */
+.overnight{background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.07);margin-bottom:12px;}
+.oc-row{display:flex;align-items:center;gap:14px;padding:18px;cursor:pointer;min-height:82px;}
+.oc-icon{width:50px;height:50px;border-radius:12px;background:var(--bbg);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.oc-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--bdark);margin-bottom:3px;}
+.oc-title{font-size:16px;font-weight:700;color:var(--t1);}
+.oc-sub{font-size:13px;color:var(--t3);margin-top:2px;}
+.oc-chev{font-size:14px;color:var(--t3);transition:transform .2s;flex-shrink:0;}
+.oc-chev.open{transform:rotate(180deg);}
+.oc-detail{display:none;border-top:1px solid var(--sep);padding:20px;}
+.oc-detail.open{display:block;}
+.oc-wk{margin-bottom:14px;}
+.oc-wk-title{font-size:15px;font-weight:700;color:var(--t1);margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.oc-wk-title span{background:var(--ind-bg);color:var(--ind);font-size:11px;font-weight:700;padding:3px 9px;border-radius:50px;}
+.oc-items{display:flex;flex-direction:column;gap:12px;}
+.oc-item{display:flex;gap:10px;align-items:flex-start;}
+.oc-em{font-size:18px;flex-shrink:0;margin-top:2px;}
+.oc-text{font-size:15px;color:var(--t2);line-height:1.6;flex:1;}
+.oc-text strong{color:var(--t1);display:block;margin-bottom:2px;font-weight:600;}
+.oc-rule{background:var(--rbg);border-radius:var(--r2);padding:12px 14px;margin-top:12px;}
+.oc-rule-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--rdark);margin-bottom:6px;}
+.oc-rule p{font-size:14px;color:var(--rdark);line-height:1.75;}
+.oc-div{height:1px;background:var(--sep);margin:14px 0;}
+
+/* BEHAVIOUR */
+.behav{background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.07);}
+.behav-row{display:flex;gap:12px;padding:14px 16px;border-bottom:1px solid var(--sep);align-items:flex-start;}
+.behav-row:last-child{border-bottom:none;}
+.behav-em{font-size:20px;flex-shrink:0;margin-top:2px;}
+.behav-title{font-size:15px;font-weight:700;color:var(--t1);margin-bottom:3px;}
+.behav-desc{font-size:14px;color:var(--t2);line-height:1.45;}
+.warn-row{background:var(--rbg);border-top:1px solid #FFD0CD;padding:12px 16px;display:flex;gap:10px;align-items:flex-start;}
+.warn-row p{font-size:14px;color:var(--rdark);line-height:1.45;}
+
+/* DASHBOARD */
+.streak{background:var(--ind);border-radius:var(--r);padding:24px;margin-bottom:16px;color:#fff;display:flex;align-items:center;gap:16px;}
+.streak-num{font-size:48px;font-weight:800;line-height:1;letter-spacing:-2px;}
+.streak-label{font-size:16px;opacity:.85;margin-top:3px;}
+.streak-sub{font-size:13px;opacity:.55;margin-top:5px;}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.stat{background:var(--card);border-radius:var(--r);padding:20px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.07);}
+.stat-n{font-size:36px;font-weight:800;line-height:1;margin-bottom:4px;letter-spacing:-1px;}
+.stat-l{font-size:12px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.3px;}
+.week-card{background:var(--card);border-radius:var(--r);padding:20px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,.07);}
+.week-title{font-size:16px;font-weight:700;margin-bottom:14px;}
+.week-days{display:flex;gap:6px;}
+.wday{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.wday-l{font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;}
+.wday-dot{width:32px;height:32px;border-radius:50%;border:2px solid var(--sep);background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:13px;}
+.wday-dot.has{background:var(--ind);border-color:var(--ind);color:#fff;}
+.wday-dot.today{border-color:var(--ind);border-width:2.5px;}
+.partner-card{background:var(--card);border-radius:var(--r);padding:20px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,.07);}
+.pc-title{font-size:16px;font-weight:700;margin-bottom:14px;}
+.pc-row{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--sep);}
+.pc-row:last-child{border-bottom:none;padding-bottom:0;}
+.pc-who{font-size:13px;font-weight:700;color:var(--ind);width:72px;flex-shrink:0;}
+.pc-sess{flex:1;font-size:14px;color:var(--t2);line-height:1.7;}
+.pc-none{font-size:14px;color:var(--t3);font-style:italic;}
+.hist-card{background:var(--card);border-radius:var(--r);padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.07);}
+.hist-title{font-size:16px;font-weight:700;margin-bottom:14px;}
+.log-item{background:var(--bg);border-radius:var(--r2);padding:14px 16px;margin-bottom:10px;border-left:3px solid var(--ind-mid);}
+.li-meta{font-size:12px;color:var(--t3);margin-bottom:3px;}
+.li-name{font-size:15px;font-weight:600;color:var(--t1);}
+.li-note{font-size:13px;color:var(--t2);margin-top:3px;line-height:1.4;}
+.li-who{font-size:12px;font-weight:600;padding:3px 8px;border-radius:50px;display:inline-block;margin-top:4px;}
+.wc{background:var(--ind-bg);color:var(--ind);}
+.wd{background:var(--gbg);color:var(--gdark);}
+
+/* TRAINING PLAN */
+.plan-hero{background:var(--ind);border-radius:var(--r);padding:24px;margin-bottom:16px;color:#fff;}
+.plan-hero h2{font-size:22px;font-weight:800;letter-spacing:-.4px;margin-bottom:5px;}
+.plan-hero p{font-size:14px;opacity:.75;line-height:1.5;}
+.stage-card{background:var(--card);border-radius:var(--r);margin-bottom:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.07);}
+.stage-card.now{outline:2px solid var(--ind);}
+.stage-card.past{opacity:.7;}
+.stage-row{display:flex;align-items:center;gap:14px;padding:18px;cursor:pointer;min-height:82px;}
+.stage-num{width:44px;height:44px;border-radius:12px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:var(--t3);flex-shrink:0;}
+.stage-card.now .stage-num{background:var(--ind);color:#fff;}
+.stage-card.next .stage-num{background:var(--ind-bg);color:var(--ind);}
+.stage-card.past .stage-num{background:var(--gbg);color:var(--gdark);font-size:18px;}
+.stage-info{flex:1;}
+.stage-badge{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--t3);margin-bottom:2px;}
+.stage-card.now .stage-badge{color:var(--ind);}
+.stage-card.past .stage-badge{color:var(--gdark);}
+.stage-name{font-size:16px;font-weight:700;color:var(--t1);margin-bottom:2px;}
+.stage-sub{font-size:13px;color:var(--t3);}
+.stage-chev{font-size:14px;color:var(--t3);transition:transform .2s;flex-shrink:0;}
+.stage-chev.open{transform:rotate(180deg);}
+.stage-detail{display:none;border-top:1px solid var(--sep);padding:20px;}
+.stage-detail.open{display:block;}
+.sd-h{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--t3);margin-bottom:6px;margin-top:12px;}
+.sd-h:first-child{margin-top:0;}
+.sd-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px;}
+.sd-pill{font-size:13px;font-weight:600;padding:5px 12px;border-radius:50px;background:var(--ind-bg);color:var(--ind);}
+.sd-item{background:var(--bg);border-radius:var(--r3);padding:12px 14px;margin-bottom:8px;font-size:15px;color:var(--t2);line-height:1.45;border-left:3px solid var(--sep2);}
+.sd-item.key{border-left-color:var(--ind);color:var(--t1);}
+.sd-warn{background:var(--rbg);border-radius:var(--r3);padding:10px 12px;font-size:14px;color:var(--rdark);border-left:3px solid var(--red);margin-top:8px;line-height:1.45;}
+
+/* MILESTONES */
+.ms-hero{background:var(--ind);border-radius:var(--r);padding:24px;margin-bottom:16px;color:#fff;}
+.ms-hero h2{font-size:22px;font-weight:800;letter-spacing:-.4px;margin-bottom:4px;}
+.ms-hero p{font-size:14px;opacity:.7;margin-bottom:12px;}
+.ms-prog-row{display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:6px;opacity:.9;}
+.ms-bar-bg{height:6px;background:rgba(255,255,255,.2);border-radius:50px;overflow:hidden;}
+.ms-bar-fill{height:100%;border-radius:50px;background:rgba(255,255,255,.8);transition:width .6s;}
+.ms-group{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--t3);margin:16px 0 6px 2px;}
+.ms-card{background:var(--card);border-radius:var(--r2);margin-bottom:6px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.07);}
+.ms-card.done{background:var(--gbg);}
+.ms-tap{display:flex;align-items:center;gap:14px;padding:16px 18px;cursor:pointer;min-height:60px;}
+.ms-check{width:26px;height:26px;border-radius:50%;border:2px solid var(--sep2);background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;transition:all .2s;}
+.ms-card.done .ms-check{background:var(--green);border-color:var(--green);color:#fff;}
+.ms-t{font-size:15px;font-weight:600;color:var(--t1);}
+.ms-d{font-size:13px;color:var(--t3);line-height:1.4;}
+.ms-date{font-size:12px;color:var(--gdark);font-weight:600;margin-top:3px;}
+.ms-thumb{width:40px;height:40px;border-radius:var(--r3);object-fit:cover;flex-shrink:0;}
+/* Compact inline expand area — photo + note side by side */
+.ms-expand{display:none;border-top:1px solid var(--sep);padding:14px 18px;background:var(--card2);}
+.ms-expand.open{display:flex;gap:12px;align-items:flex-start;}
+.ms-photo-zone{width:72px;height:72px;border-radius:var(--r2);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;border:2px dashed var(--sep2);background:var(--bg);overflow:hidden;}
+.ms-photo-zone img{width:100%;height:100%;object-fit:cover;}
+.ms-photo-zone-empty{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.ms-photo-zone-empty span{font-size:20px;}
+.ms-photo-zone-empty p{font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.3px;}
+.ms-photo-input{display:none;}
+.ms-note-col{flex:1;display:flex;flex-direction:column;gap:8px;}
+.ms-ta{width:100%;background:var(--card);border:1px solid var(--sep);border-radius:var(--r3);padding:9px 11px;font-family:'Inter',sans-serif;font-size:14px;color:var(--t1);resize:none;min-height:72px;outline:none;}
+.ms-ta:focus{border-color:var(--ind);}
+.ms-action-row{display:flex;gap:6px;}
+.ms-save{flex:1;background:var(--ind);color:#fff;border:none;border-radius:var(--r3);padding:9px 12px;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
+.ms-remove{background:none;color:var(--t3);border:none;border-radius:var(--r3);padding:9px 10px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;cursor:pointer;}
+
+/* SHEET */
+.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:none;align-items:flex-end;}
+.sheet-bg.open{display:flex;}
+.sheet{background:var(--card);border-radius:20px 20px 0 0;padding:8px 20px 48px;width:100%;max-height:90vh;overflow-y:auto;}
+.sheet-handle{width:36px;height:4px;border-radius:50px;background:var(--sep2);margin:10px auto 20px;}
+.sheet h3{font-size:20px;font-weight:800;letter-spacing:-.4px;margin-bottom:16px;}
+.sheet-segs{display:flex;background:var(--bg);border-radius:var(--r2);padding:2px;margin-bottom:18px;}
+.sheet-seg{flex:1;padding:8px;border:none;border-radius:8px;background:transparent;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;color:var(--t3);transition:all .15s;text-align:center;}
+.sheet-seg.on{background:var(--card);color:var(--t1);box-shadow:0 1px 3px rgba(0,0,0,.1);}
+.sheet-form{display:none;}
+.sheet-form.on{display:block;}
+.fg{display:flex;flex-direction:column;margin-bottom:18px;}
+.fl{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--t3);margin-bottom:6px;}
+input,select,textarea{width:100%;padding:12px 14px;border:1px solid var(--sep);border-radius:var(--r2);font-family:'Inter',sans-serif;font-size:16px;color:var(--t1);background:var(--bg);outline:none;-webkit-appearance:none;}
+input:focus,select:focus,textarea:focus{border-color:var(--ind);}
+textarea{resize:vertical;min-height:60px;}
+.chips{display:flex;gap:8px;flex-wrap:wrap;}
+.chip{padding:10px 16px;border:1px solid var(--sep);border-radius:50px;background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;font-weight:500;cursor:pointer;color:var(--t3);}
+.chip.on{border-color:var(--ind);background:var(--ind-bg);color:var(--ind);}
+.rbs{display:flex;gap:10px;}
+.rb{flex:1;padding:13px 6px;border:1px solid var(--sep);border-radius:var(--r2);background:var(--bg);font-family:'Inter',sans-serif;font-size:14px;font-weight:500;cursor:pointer;text-align:center;color:var(--t3);}
+.rb.on{border-color:var(--ind);background:var(--ind-bg);color:var(--ind);}
+.btn-save{width:100%;padding:15px;border:none;border-radius:var(--r2);background:var(--ind);color:#fff;font-family:'Inter',sans-serif;font-size:17px;font-weight:700;cursor:pointer;margin-top:6px;}
+.btn-cancel{width:100%;padding:14px;border:none;border-radius:var(--r2);background:var(--bg);color:var(--t2);font-family:'Inter',sans-serif;font-size:16px;font-weight:600;cursor:pointer;margin-top:8px;}
+
+/* TIMER */
+.timer-bg{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:300;display:none;align-items:center;justify-content:center;padding:24px;}
+.timer-bg.open{display:flex;}
+.timer-card{background:var(--ind);border-radius:24px;padding:28px 24px 24px;text-align:center;width:100%;max-width:300px;color:#fff;}
+.timer-tag{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;opacity:.6;margin-bottom:4px;}
+.timer-name{font-size:16px;font-weight:700;margin-bottom:20px;opacity:.9;}
+.timer-time{font-size:60px;font-weight:800;letter-spacing:-3px;margin-bottom:8px;font-variant-numeric:tabular-nums;}
+.timer-track{height:4px;background:rgba(255,255,255,.2);border-radius:50px;overflow:hidden;margin-bottom:18px;}
+.timer-fill{height:100%;background:rgba(255,255,255,.75);border-radius:50px;transition:width .5s linear;}
+.timer-msg{font-size:14px;color:rgba(255,255,255,.7);margin-bottom:10px;min-height:20px;}
+.timer-btn{padding:13px 20px;border:none;border-radius:12px;background:rgba(255,255,255,.15);color:#fff;font-family:'Inter',sans-serif;font-size:15px;font-weight:600;cursor:pointer;margin:4px;}
+.timer-btn.pri{background:rgba(255,255,255,.95);color:var(--ind);}
+
+/* MISC */
+.empty{text-align:center;padding:32px 16px;color:var(--t3);}
+.empty .ei{font-size:36px;margin-bottom:10px;}
+.empty p{font-size:15px;line-height:1.5;}
+#toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(10px);background:rgba(0,0,0,.85);color:#fff;padding:10px 20px;border-radius:50px;font-size:14px;font-weight:600;opacity:0;transition:all .25s;z-index:500;white-space:nowrap;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<div id="splash"><div class="sp">🐾</div><h2>Barney's Training</h2><p>Getting today ready...</p></div>
+
+<div id="login">
+  <div class="login-paw">🐾</div>
+  <div class="login-title">Barney's Training</div>
+  <div class="login-sub">Who's training today?</div>
+  <button class="login-btn" onclick="setUser('Caroline')">
+    <span class="lb-av">👩</span>
+    <div><div class="lb-name">Caroline</div><div class="lb-role">Head trainer</div></div>
+  </button>
+  <button class="login-btn" onclick="setUser('Darren')">
+    <span class="lb-av">👨</span>
+    <div><div class="lb-name">Darren</div><div class="lb-role">Co-trainer</div></div>
+  </button>
+</div>
+
+<div id="syncBar"><span class="dot" id="sd"></span><span id="stxt">Connecting...</span></div>
+
+<div id="hdr">
+  <div class="hdr-left">
+    <div class="hdr-av">🐾</div>
+    <div><div class="hdr-name">Barney</div><div class="hdr-date" id="hdate"></div></div>
+  </div>
+  <div class="hdr-right">
+    <span class="age-pill" id="apill"></span>
+    <span class="user-pill" id="upill" onclick="switchUser()"></span>
+  </div>
+</div>
+
+<div id="app">
+
+<div class="page on" id="page-today">
+  <div class="stage-banner">
+    <div class="sb-tag" id="sbTag"></div>
+    <div class="sb-title" id="sbTitle">Loading...</div>
+    <div class="sb-sub" id="sbSub"></div>
+    <div class="sb-warn" id="sbWarn" style="display:none"></div>
+  </div>
+  <div class="tip-card">
+    <div class="tip-icon">💡</div>
+    <div><div class="tip-label">Tip of the day</div><div class="tip-text" id="tipText"></div></div>
+  </div>
+  <div id="aiChallenge"></div>
+  <div class="sec">Today's 3 Sessions</div>
+  <div id="sessionsEl"></div>
+  <div class="sec">Toilet Tracker</div>
+  <div class="toilet">
+    <div class="toilet-head"><div class="toilet-title">Tap each time Barney goes</div><div class="toilet-count" id="ttCount">0 outside · 0 accidents</div></div>
+    <div class="toilet-btns">
+      <button class="toilet-btn out" onclick="logToilet('outside')"><span class="ti">✅</span><span class="tl">Outside</span></button>
+      <button class="toilet-btn acc" onclick="logToilet('accident')"><span class="ti">💧</span><span class="tl">Accident</span></button>
+    </div>
+    <div class="toilet-log" id="ttLog"></div>
+  </div>
+  <div class="sec">Daily Checklist</div>
+  <div class="checklist" id="checklistEl"></div>
+  <div class="partner-strip" id="partnerStrip" style="display:none"></div>
+  <div class="milestone-prompt" onclick="goPage('wins',document.querySelector('.ntab:last-child'))">
+    <span class="mp-icon">🏆</span>
+    <span class="mp-text">Did Barney nail something today? Log a milestone →</span>
+  </div>
+</div>
+
+<div class="page" id="page-plan">
+  <div class="plan-hero"><h2>📋 Training Plan</h2><p>8 weeks to 12 months — every stage mapped. Current stage highlighted.</p></div>
+  <div class="sec">🌙 Overnight Guidance</div>
+  <div class="overnight">
+    <div class="oc-row" onclick="toggleOC()">
+      <div class="oc-icon">🌙</div>
+      <div style="flex:1"><div class="oc-label">Crate &amp; Sleep Guide</div><div class="oc-title">Sleeping Through the Night</div><div class="oc-sub">Week by week — what to expect</div></div>
+      <div class="oc-chev" id="ocChev">▼</div>
+    </div>
+    <div class="oc-detail" id="ocDetail">
+      <div class="oc-wk"><div class="oc-wk-title">Every night — the routine <span>always do this</span></div>
+        <div class="oc-items">
+          <div class="oc-item"><div class="oc-em">🚽</div><div class="oc-text"><strong>Last toilet trip as late as possible</strong>Take him out at 10–11pm. Wait until he goes, then praise warmly.</div></div>
+          <div class="oc-item"><div class="oc-em">🏠</div><div class="oc-text"><strong>Crate near your bed for weeks 1–4</strong>He needs to hear and smell you. Isolation at night makes crying far worse.</div></div>
+          <div class="oc-item"><div class="oc-em">🧣</div><div class="oc-text"><strong>Worn clothing inside the crate</strong>A T-shirt with your scent. Replace every few days.</div></div>
+          <div class="oc-item"><div class="oc-em">🔇</div><div class="oc-text"><strong>Cover the crate</strong>Blanket over the top and 3 sides — dark and den-like helps him settle faster.</div></div>
+        </div>
+      </div>
+      <div class="oc-div"></div>
+      <div class="oc-wk"><div class="oc-wk-title">Week 8 — first nights <span>what to expect</span></div>
+        <div class="oc-items">
+          <div class="oc-item"><div class="oc-em">😢</div><div class="oc-text"><strong>He will cry. This is completely normal.</strong>He has left his mum and siblings. The crying is communication, not naughtiness.</div></div>
+          <div class="oc-item"><div class="oc-em">⏰</div><div class="oc-text"><strong>Expect 1–2 wake-ups per night</strong>His bladder holds roughly 3–4 hours at 8 weeks. A 2am and 5am wake-up is normal.</div></div>
+          <div class="oc-item"><div class="oc-em">🤫</div><div class="oc-text"><strong>Night toilet trips — keep them boring</strong>Lights low. No talking. No eye contact. No cuddles. Straight outside, wait, back in crate.</div></div>
+          <div class="oc-item"><div class="oc-em">📉</div><div class="oc-text"><strong>It improves every night</strong>Night 1 is hardest. Most puppies are down to one wake-up by week 2.</div></div>
+        </div>
+      </div>
+      <div class="oc-div"></div>
+      <div class="oc-wk"><div class="oc-wk-title">Weeks 9–11 <span>the goal</span></div>
+        <div class="oc-items">
+          <div class="oc-item"><div class="oc-em">✅</div><div class="oc-text"><strong>Push last toilet trip later</strong>An 11pm trip may mean he sleeps to 5–6am.</div></div>
+          <div class="oc-item"><div class="oc-em">🌟</div><div class="oc-text"><strong>Sleeping through by 12–14 weeks is realistic</strong>Most puppies manage 10pm–6am with consistent crate training.</div></div>
+        </div>
+      </div>
+      <div class="oc-div"></div>
+      <div class="oc-rule">
+        <div class="oc-rule-title">❌ Never break these rules</div>
+        <p>Never open the crate while he is actively crying — wait for 2 seconds of quiet first.<br><br>Never take him into your bed — very hard to undo.<br><br>Never skip the late-night toilet trip — accidents in the crate set back training significantly.</p>
+      </div>
+    </div>
+  </div>
+  <div class="sec" style="margin-top:8px">All Stages</div>
+  <div id="planEl"></div>
+</div>
+
+<div class="page" id="page-dash">
+  <div class="streak">
+    <div style="font-size:40px">🔥</div>
+    <div><div class="streak-num" id="streakNum">0</div><div class="streak-label">day streak</div><div class="streak-sub" id="streakSub">Train today to start your streak</div></div>
+  </div>
+  <div class="sess-progress" style="margin-bottom:12px;">
+    <div id="dashSummary" style="font-size:15px;font-weight:600;color:var(--t2);">Loading today's progress...</div>
+  </div>
+  <div class="stat-grid">
+    <div class="stat"><div class="stat-n" id="pTot" style="color:var(--ind)">0</div><div class="stat-l">Sessions</div></div>
+    <div class="stat"><div class="stat-n" id="pMs" style="color:var(--gdark)">0</div><div class="stat-l">Milestones</div></div>
+    <div class="stat"><div class="stat-n" id="pOut" style="color:var(--bdark)">0</div><div class="stat-l">Outings</div></div>
+    <div class="stat"><div class="stat-n" id="pCr" style="color:var(--t2)">0</div><div class="stat-l">Crate logs</div></div>
+  </div>
+  <div class="week-card"><div class="week-title">This week</div><div class="week-days" id="wsDays"></div></div>
+  <div class="partner-card"><div class="pc-title">Today — both trainers</div><div id="partnerLog"></div></div>
+  <div class="hist-card"><div class="hist-title">Recent history</div><div id="recentLog"></div></div>
+</div>
+
+<div class="page" id="page-wins">
+  <div class="ms-hero"><h2>🏆 Milestones</h2><p>Tap a milestone the moment Barney achieves it. Add a note to remember how it happened.</p>
+    <div class="ms-prog-row"><span>Progress</span><span id="msCount">0 / 27</span></div>
+    <div class="ms-bar-bg"><div class="ms-bar-fill" id="msBar" style="width:0%"></div></div>
+  </div>
+  <div id="msEl"></div>
+</div>
+
+</div><!-- /app -->
+
+<nav id="nav">
+  <button class="ntab on" onclick="goPage('today',this)"><span class="ni">☀️</span>Today</button>
+  <button class="ntab" onclick="goPage('plan',this)"><span class="ni">📋</span>Training Plan</button>
+  <button class="ntab" onclick="goPage('dash',this)"><span class="ni">📊</span>Dashboard</button>
+  <button class="ntab" onclick="goPage('wins',this)"><span class="ni">🏆</span>Milestones</button>
+</nav>
+
+<button id="fab" onclick="openSheet()">+</button>
+
+<div class="sheet-bg" id="sheetBg" onclick="if(event.target===this)closeSheet()">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <h3>Quick Log</h3>
+    <div class="sheet-segs">
+      <button class="sheet-seg on" onclick="switchSeg('crate',this)">🏠 Crate</button>
+      <button class="sheet-seg" onclick="switchSeg('outing',this)">🌍 Outing</button>
+      <button class="sheet-seg" onclick="switchSeg('toilet',this)">🚽 Toilet</button>
+    </div>
+    <div class="sheet-form on" id="sf-crate">
+      <div class="fg"><div class="fl">Duration</div>
+        <select id="cDur"><option>5 mins</option><option>10 mins</option><option>15 mins</option><option>20 mins</option><option>30 mins</option><option>45 mins</option><option>1 hour</option><option>2 hours</option><option>3+ hours</option><option>Overnight</option></select>
+      </div>
+      <div class="fg"><div class="fl">How settled?</div>
+        <div class="chips">
+          <button class="chip" onclick="pick('cset',this,'😴 Settled')">😴 Settled</button>
+          <button class="chip" onclick="pick('cset',this,'😐 Restless')">😐 Restless</button>
+          <button class="chip" onclick="pick('cset',this,'😢 Crying')">😢 Crying</button>
+          <button class="chip" onclick="pick('cset',this,'🚨 Distressed')">🚨 Distressed</button>
+        </div>
+      </div>
+      <div class="fg"><div class="fl">Note</div><textarea id="cNote" placeholder="e.g. settled after 5 mins..."></textarea></div>
+      <button class="btn-save" onclick="saveCrate()">Save crate log</button>
+      <button class="btn-cancel" onclick="closeSheet()">Cancel</button>
+    </div>
+    <div class="sheet-form" id="sf-outing">
+      <div class="fg"><div class="fl">Where?</div><input type="text" id="sLoc" placeholder="e.g. garden centre, town..."></div>
+      <div class="fg"><div class="fl">Method</div>
+        <div class="chips">
+          <button class="chip" onclick="pick('smeth',this,'🎽 Sling')">🎽 Sling</button>
+          <button class="chip" onclick="pick('smeth',this,'🤲 Carried')">🤲 Carried</button>
+          <button class="chip" onclick="pick('smeth',this,'🦮 Lead')">🦮 Lead</button>
+          <button class="chip" onclick="pick('smeth',this,'🐕 Off lead')">🐕 Off lead</button>
+        </div>
+      </div>
+      <div class="fg"><div class="fl">His reaction</div>
+        <div class="rbs">
+          <button class="rb" onclick="pick('sreact',this,'😎 Confident')">😎 Confident</button>
+          <button class="rb" onclick="pick('sreact',this,'🔍 Curious')">🔍 Curious</button>
+          <button class="rb" onclick="pick('sreact',this,'😟 Nervous')">😟 Nervous</button>
+        </div>
+      </div>
+      <div class="fg"><div class="fl">Note</div><textarea id="sNoteOut" placeholder="How did he handle it?"></textarea></div>
+      <button class="btn-save" onclick="saveOuting()">Save outing</button>
+      <button class="btn-cancel" onclick="closeSheet()">Cancel</button>
+    </div>
+    <div class="sheet-form" id="sf-toilet">
+      <p style="font-size:15px;color:var(--t2);margin-bottom:20px;line-height:1.5;">Tap to log a toilet trip outside of the tracker on Today.</p>
+      <div style="display:flex;gap:10px;margin-bottom:16px;">
+        <button onclick="logToiletSheet('outside')" style="flex:1;padding:20px;border:none;border-radius:var(--r);background:var(--gbg);color:var(--gdark);font-family:Inter,sans-serif;font-size:18px;font-weight:700;cursor:pointer;">✅ Outside</button>
+        <button onclick="logToiletSheet('accident')" style="flex:1;padding:20px;border:none;border-radius:var(--r);background:var(--rbg);color:var(--rdark);font-family:Inter,sans-serif;font-size:18px;font-weight:700;cursor:pointer;">💧 Accident</button>
+      </div>
+      <button class="btn-cancel" onclick="closeSheet()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="timer-bg" id="timerBg">
+  <div class="timer-card">
+    <div class="timer-tag">Session Timer</div>
+    <div class="timer-name" id="timerName"></div>
+    <div class="timer-time" id="timerTime">2:00</div>
+    <div class="timer-track"><div class="timer-fill" id="timerFill" style="width:100%"></div></div>
+    <div class="timer-msg" id="timerMsg"></div>
+    <button class="timer-btn pri" onclick="stopTimer()">Done ✓</button>
+    <button class="timer-btn" onclick="closeTimer()">Close</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const DOB=new Date('2026-01-27T00:00:00');
+let currentUser=localStorage.getItem('barneyUser')||null;
+let picks={},openSC=new Set(),openSR=new Set(),openMS=new Set();
+let timerIv=null,timerTotal=0,timerLeft=0;
+let allData={sessions:[],crate:[],social:[],milestones:{},checklist:{},done:{},toilet:{}};
+
+const weeksOld=()=>Math.max(8,Math.floor((Date.now()-DOB.getTime())/604800000));
+const ageLabel=()=>{const w=weeksOld();return w<16?`${w} weeks old`:`${Math.floor(w/4.33)} months old`;};
+const todayStr=()=>new Date().toDateString();
+const fmt=ts=>new Date(ts).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+const fmtD=ts=>new Date(ts).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+const fmtDT=ts=>`${fmtD(ts)} ${fmt(ts)}`;
+
+// STORAGE — safe wrapper for window.storage (only available in Claude.ai context)
+const hasCloudStorage=()=>typeof window!=='undefined'&&window.storage&&typeof window.storage.get==='function';
+
+function saveLocal(){try{localStorage.setItem('barneyV4',JSON.stringify(allData));}catch{}}
+function loadLocal(){try{const v=localStorage.getItem('barneyV4');if(v)allData=JSON.parse(v);}catch{}}
+async function cloudLoad(){
+  setSS('spin','Syncing...');
+  if(!hasCloudStorage()){setSS('ok','✓ Local');return;}
+  try{const r=await window.storage.get('barney_v4',true);if(r&&r.value)try{mergeData(JSON.parse(r.value));}catch{}setSS('ok','✓ Synced');}
+  catch{setSS('err','Offline — saved locally');}
+}
+async function cloudSave(){
+  saveLocal();
+  if(!hasCloudStorage()){setSS('ok','✓ Saved locally');return;}
+  setSS('spin','Saving...');
+  try{await window.storage.set('barney_v4',JSON.stringify(allData),true);setSS('ok','✓ Saved');}
+  catch{setSS('err','Saved locally only');}
+}
+function mergeData(r){
+  ['sessions','crate','social'].forEach(k=>{const l=allData[k]||[],rem=r[k]||[],ts=new Set(l.map(x=>x.ts));rem.forEach(x=>{if(!ts.has(x.ts))l.push(x);});allData[k]=l.sort((a,b)=>b.ts-a.ts);});
+  allData.milestones=Object.assign({},(r.milestones||{}),(allData.milestones||{}));
+  if(r.checklist)Object.assign(allData.checklist,r.checklist);
+  if(r.done)Object.assign(allData.done||{},r.done);
+  if(r.toilet)Object.assign(allData.toilet||{},r.toilet);
+}
+function setSS(c,m){document.getElementById('sd').className='dot'+(c==='ok'?' ok':c==='spin'?' spin':c==='err'?' err':'');document.getElementById('stxt').textContent=m;}
+
+// USER
+function setUser(n){currentUser=n;localStorage.setItem('barneyUser',n);document.getElementById('login').style.display='none';showApp();}
+function switchUser(){if(!confirm('Switch trainer? Your current session won\'t be lost.'))return;document.getElementById('login').style.display='flex';document.getElementById('hdr').style.display='none';document.getElementById('app').style.display='none';document.getElementById('nav').classList.remove('visible');document.getElementById('syncBar').style.display='none';document.getElementById('fab').style.display='none';}
+
+// TIPS
+const tips={
+  8:['Sessions max 2 minutes — quality beats quantity every time.','Every toilet trip outside gets a warm "good boy!" The praise matters more than you think.','The crate should smell like you. Put a worn T-shirt inside tonight.','Redirect biting to a toy immediately. Never shout — it increases excitement.','Socialisation starts now. Even a quiet car park in the sling counts.','End every session on a success, even if you make the last rep easier.'],
+  10:['Say "Sit" once. Wait 3 seconds. Then lure. One cue, then wait.','Leave it: reward with a better treat. Make backing off the best deal.','The settle mat is for life. 5 minutes today builds the café dog of tomorrow.','Vary where you practice — kitchen, garden, hallway. Commands need to work everywhere.','Recall: make it a party every single time. This habit lasts forever.','He will test you this week. Consistent calm wins every time.'],
+  12:['Down can take all week for a Springer. Patience and zero physical pressure.','Recall chase game: run away from him in the garden. Pure joy and brilliant training.','Frozen Kong tonight = settled crate tomorrow. Prepare it now.','Socialisation window is closing. Make today\'s outing count.','Say "Wait" at every single door. Every time. 5 seconds, lifelong habit.','Crate max 30 minutes daytime this week.'],
+  14:['Walk maximum 5 minutes. It feels short — it is right.','Stop the instant the lead tightens. Every. Single. Step.','Recall outdoors: use your best treats. Better than anything on the ground.','He may seem to forget things he knew. Normal. Stay consistent.','A sniff walk tires him more than a march. Let him sniff everything.','The settle word now means something. Use it at mealtimes and at the vet.'],
+  17:['Adolescence peaks 5–8 months. Increase training, don\'t reduce it.','Long line outdoors: one call, then go get him. Never repeat the command.','Settle in a new place this week — different room, friend\'s house.','Fetch: 10 throws maximum. End while he still wants more.','He is not being naughty — he is a teenager. Calm and consistent wins.','Every session during adolescence is relationship-building.'],
+  26:['Jackpot every outdoor recall. Always. Forever. No exceptions.','The settle mat goes everywhere now — café, pub, vet.','Scent work on bad weather days — 15 minutes tires him more than a 2-mile walk.','Off-lead only in fully secure areas until recall is rock solid.','The work from weeks 8–16 is showing. Keep going — it compounds.','A Springer who has a job is a happy Springer. Give him tasks.']
+};
+function getTip(){const w=weeksOld();let k=8;if(w>=26)k=26;else if(w>=17)k=17;else if(w>=14)k=14;else if(w>=12)k=12;else if(w>=10)k=10;const l=tips[k];const d=Math.floor((Date.now()-DOB.getTime())/86400000);return l[d%l.length];}
+
+// CURRICULUM
+const stages=[
+{id:'w8',startW:8,endW:10,label:'Weeks 8–9',title:'First Week Home',sub:'Start simple. His attention span is tiny — 2 minutes maximum per session, 3–4 times a day.',warn:'Not yet vaccinated. Carry in a sling for all public outings — no ground contact.',sessions:[
+  {id:'s_name',icon:'👂',bg:'#EEF2FF',num:'Session 1 · Getting Started',title:'Name Recognition',dur:'2 mins · repeat 3–4× today',timerSecs:120,why:'Before any training can happen, Barney needs to know his name means "pay attention to you." Everything builds from this.',outcome:'Turns and makes eye contact every time you say "Barney" — first time, every time.',steps:['Sit on the floor. Have 10 tiny treats ready — each pea-sized.','Wait until he is not already looking at you.','Say "Barney" once in a warm, happy voice. Do not repeat it.','The instant he turns to look: say "Yes!" and give a treat immediately.','Repeat exactly 5 times then stop.','Do this 3–4 times throughout today with gaps in between.'],donot:['Never say "Barney Barney Barney" — say it once and wait. Repeating teaches him to ignore it.','Never use his name in a cross tone.','Do not train for more than 2 minutes at a time.'],tip:'💡 The treat size does not matter. The "Yes!" marker word is what does the teaching.'},
+  {id:'s_crate1',icon:'🏠',bg:'#F0FBF3',num:'Session 2 · Crate Training',title:'Crate as Happy Place',dur:'Throughout the day — no time limit yet',timerSecs:0,why:'The crate will be his safe den for years. Today is purely about making him love going in.',outcome:'Willingly walks into the crate and will lie down inside with the door open.',steps:['Place the crate in your main living area — not an isolated room.','Put a soft blanket and a worn piece of your clothing inside.','Cover the top and back two sides with a blanket — cosy den feeling.','Several times today, toss a small treat just inside the entrance.','Let him walk in freely to get it. Do not close the door.','Feed his first meal in a bowl just inside the open entrance.'],donot:['Do not close the crate door today — not at all.','Never push him in or block his exit.','Never use the crate as punishment.'],tip:'💡 Think of it like showing someone a new bedroom. You would not lock them in on day one.'},
+  {id:'s_settle1',icon:'😌',bg:'#EEF2FF',num:'Session 3 · Settle Training',title:'Learning to Be Calm',dur:'5 mins · when he is already sleepy',timerSecs:300,why:'Teaching Barney to switch off is the foundation of everything. It prevents anxiety and means you can take him everywhere.',outcome:'Lies calmly on his blanket nearby without constantly demanding attention.',steps:['Wait for a moment when Barney is naturally slowing down — after play or a meal.','Sit quietly. Place his bed nearby.','Do not engage with him, talk to him, or encourage him.','If he wanders to his bed and lies down: say "Yes" very quietly and drop a treat near him.','If he pesters you: completely ignore him — no eye contact, no talking.','When he gives up and lies down: quietly say "Yes" and drop a treat.'],donot:['Do not make the reward exciting — speak quietly.','Do not reward while he is standing or pawing at you.','Do not force him onto his bed.','Do not attempt when he is full of energy.'],tip:'💡 This is called "capturing calm." Every quiet reward builds a calmer dog.'}
+],checklist:['Name game (3–4 times)','Crate treats and meals inside','Calm/settle practice','Overnight crate near your bed'],behaviour:[{e:'😴',title:'Sleeps constantly',desc:'16–18 hours a day at 8 weeks is completely normal. Never wake a sleeping puppy.'},{e:'🚽',title:'Tiny bladder',desc:'Cannot hold it more than 30–45 minutes when awake. Outside after every sleep, meal, drink and play.'},{e:'😢',title:'Crying overnight',desc:'Completely normal for the first few nights. Crate near your bed. It improves each night.'},{e:'😬',title:'Biting everything',desc:'Normal — redirect to a chew toy every time. Never shout or tap his nose.'},{e:'🥺',title:'Clingy or unsettled',desc:'He has lost everything familiar. Your calm presence is the most important thing right now.'}],tips:['Toilet after every sleep, meal, drink and play','Sessions: 2 minutes maximum','Start sling walks — garden centres and car parks are perfect'],focus:['Name Recognition','Crate as happy place','Capturing calm']},
+
+{id:'w10',startW:10,endW:12,label:'Weeks 10–11',title:'The Learning Explosion',sub:'His brain is firing. Add Sit, Leave It and socialise hard.',warn:null,sessions:[
+  {id:'s_sit',icon:'🐾',bg:'#EEF2FF',num:'Session 1 · Commands',title:'Sit — Teaching from Zero',dur:'2 mins max · 3× today',timerSecs:120,why:'Sit is the foundation command everything else builds from.',outcome:'Sits immediately on a single verbal cue "Sit" with no lure needed.',steps:['Hold a treat at his nose level.','Slowly move the treat backward over the top of his head.','His bottom will naturally lower as his nose follows.','The instant his bottom touches the floor: "Yes!" and treat.','Repeat 4 more times. 5 reps maximum per session.','After 3–4 days: say "Sit" before showing the treat.'],donot:['Never push his bottom down.','Never say "Sit, sit, sit" — one cue then wait.','Do not do more than 5 reps.'],tip:'💡 The moment he sits before you move the treat — celebrate. That is the whole goal.'},
+  {id:'s_leaveit',icon:'✋',bg:'#EEF2FF',num:'Session 2 · Commands',title:'Leave It — Teaching from Zero',dur:'2 mins · 2× today',timerSecs:120,why:'Springers put everything in their mouths. Leave it is a safety command that could save his life.',outcome:'Moves away from any food or object on a single "Leave it" cue.',steps:['Put one treat in your right fist and hold it out.','Let him sniff, lick and paw at your fist. Say nothing. Just wait.','The moment he backs off even slightly: "Yes!" immediately.','Give him a DIFFERENT treat from your left hand. Never open the right fist.','Repeat. He should back off quicker each time.','After a few sessions: say "Leave it" before presenting the fist.'],donot:['Never give him the treat from the fist — ever.','Do not say "leave it" until he understands the game.'],tip:'💡 Always reward with something better than what he is leaving.'},
+  {id:'s_settle2',icon:'😌',bg:'#EBF4FF',num:'Session 3 · Settle Training',title:'Settle on a Mat',dur:'5–10 mins · once or twice today',timerSecs:600,why:'This week we formalise settle by adding a mat. The mat becomes a visual anchor — put it down anywhere and he settles on it.',outcome:'Barney lies on his mat near you and stays there for 30 seconds.',steps:['Get a specific mat — a piece of vet bed or small blanket. This is always "his mat."','Sit in your chair. Place the mat about a metre from your feet.','Drop a treat ON the mat quietly.','Each time he steps ON the mat: drop another treat.','If he lies DOWN: drop 2–3 treats quietly near his nose.','After a week: say "Settle" quietly as he lies down.'],donot:['Do not call him to the mat — let him choose.','Do not reward while standing — only when calm on the mat.','Do not use excited praise.'],tip:'💡 Put the mat in different rooms over time. The mat travels with you.'}
+],checklist:['Sit practice (3 sessions)','Leave it practice (2 sessions)','Settle on mat','Sling outing — somewhere new','Toilet routine maintained'],behaviour:[{e:'🐾',title:'Testing you',desc:'Working out the rules. Calm and consistent responses every time.'},{e:'😬',title:'Biting harder',desc:'Teething. Say "ouch" calmly, remove attention 10 seconds, redirect to a chew toy.'},{e:'🎓',title:'Learning fast',desc:'Peak learning window. Short positive sessions. Always end on a success.'},{e:'🏠',title:'Crate settling',desc:'Should be comfortable for 30 minutes by end of week 10.'}],tips:['Sit in 3 different locations','Build crate to 30 mins with door closed','3 new sling experiences this week'],focus:['Sit','Leave It','Settle on mat']},
+
+{id:'w12',startW:12,endW:14,label:'Weeks 12–13',title:'Pre-Vaccination Push',sub:'Almost vaccinated. Max out socialisation — this window closes soon.',warn:'Make every day count for socialisation. The critical window closes at 16 weeks.',sessions:[
+  {id:'s_down',icon:'⬇️',bg:'#EEF2FF',num:'Session 1 · Commands',title:'Down — Teaching from Zero',dur:'2 mins · 3× today',timerSecs:120,why:'Down builds on sit. Foundation for stay and settle. Springers can resist — patience essential.',outcome:'Lies fully down on a single "Down" cue — both elbows on the floor.',steps:['Start with Barney in a sit.','Hold a treat at his nose. Slowly lower it straight down between his front paws.','He will follow the treat downward — elbows should start to lower.','The moment EITHER elbow touches the floor: "Yes!" and give the treat.','Repeat 4 more times. Over several days the full down will come.','Once consistent: say "Down" just before lowering the treat.'],donot:['Never push his shoulders down.','Lure straight down between the paws, not sideways.','Do not add the verbal cue until the movement is consistent.'],tip:'💡 If he keeps standing up, try on a slightly raised surface.'},
+  {id:'s_recall1',icon:'🏃',bg:'#FFF1F0',num:'Session 2 · Commands',title:'Come / Recall — Teaching from Zero',dur:'3 mins · 2× today',timerSecs:180,why:'The most important command you will ever teach. Build this and never let the reward drop — ever.',outcome:'Runs to you immediately when called, every single time.',steps:['Start in a small room with no distractions. High-value treats — chicken or cheese.','Let Barney wander a short distance.','Crouch down, open your arms wide. Most excited voice: "Barney, COME!"','When he reaches you: 3–5 treats one by one, huge praise.','Repeat 4 more times.','Over next few days: different rooms, then the garden.'],donot:['Never call him and then do something he dislikes.','Never punish a slow recall.','Never repeat the command — say it once.','Do not reduce the reward as he improves.'],tip:'💡 Recall should feel like the best thing that ever happens to him.'},
+  {id:'s_crate2',icon:'🏠',bg:'#F0FBF3',num:'Session 3 · Crate Training',title:'Crate Door Closing — Duration',dur:'Building throughout the day',timerSecs:0,why:'Now the crate is positive, introduce the door closing gradually. Goal: 30 minutes settled.',outcome:'Settles in the crate with door closed for up to 30 minutes.',steps:['Prepare a frozen Kong the night before.','Toss a treat into the crate. When he follows: close the door 3 seconds, immediately open.','Build slowly: 10 seconds, 30 seconds, 1 minute, 5 minutes.','For longer durations: frozen Kong inside first, then close the door.','If he cries: wait for 2 seconds of quiet before opening.','Toilet trip immediately after every crate session.'],donot:['Do not close the door before he voluntarily goes in.','Never open while crying.','Do not exceed 30 minutes daytime at this age.'],tip:'💡 A frozen Kong prepared the night before is the most effective crate training tool.'}
+],checklist:['Down practice (3 sessions)','Recall practice (2 sessions)','Crate with door closed','Sling outing — one new thing','Settle on mat practice'],behaviour:[{e:'🎉',title:'Vaccination week',desc:'Usually around 12 weeks. Once done, Barney can go on the ground in public.'},{e:'🧠',title:'Clever and testing',desc:'Learning cause and effect. Consistent every single time.'},{e:'😴',title:'Naps getting shorter',desc:'Use training time well — unsupervised time leads to mischief.'},{e:'🦷',title:'Teething peaks',desc:'More chewing. Rotate chews. Frozen carrots excellent for sore gums.'}],tips:['3 new sling experiences this week','Crate: build to 30 mins with door closed','Down may take all week — patience'],focus:['Down','Recall','Crate door closing']},
+
+{id:'w14',startW:14,endW:17,label:'Weeks 14–16',title:'First Real Walks!',sub:'Post-vaccination freedom. Keep every walk very short and make everything positive.',warn:'Maximum walk duration: 5 minutes. Puppy joints are still developing.',sessions:[
+  {id:'s_wait',icon:'🛑',bg:'#EEF2FF',num:'Session 1 · Commands',title:'Wait — Teaching from Zero',dur:'2 mins · every door today',timerSecs:120,why:'Wait teaches Barney to pause at doorways. A lifelong safety habit.',outcome:'Sits and waits at every door on a single "Wait" cue.',steps:['Approach a door with Barney. Ask him to sit.','Put your hand on the handle and say "Wait" calmly.','Open the door very slowly — just a few centimetres.','If Barney moves: calmly close the door. No fuss.','Ask him to sit again. Try opening again.','When he holds the sit: say "OK" and invite him through.'],donot:['Do not block him with your leg — just close the door.','Do not use the same word for Wait and Stay.','Do not skip any door — consistency builds the habit.'],tip:'💡 Wait at every door and every meal. 5 extra seconds, lifelong habit.'},
+  {id:'s_lead1',icon:'🦮',bg:'#EEF2FF',num:'Session 2 · Loose Lead',title:'Loose Lead — Starting in the Garden',dur:'5 mins · garden only',timerSecs:300,why:'Start before real walks. Springers pull hard by instinct. The only rule: the lead never goes tight.',outcome:'Walks next to you in the garden without pulling.',steps:['Fit harness or collar. Attach lead and let him settle 30 seconds.','Start walking forward.','The INSTANT the lead tightens — stop completely. No pulling back. Just stop.','Wait. When he turns and lead goes slack: "Yes!" and treat.','Change direction randomly — he needs to watch where you are going.','Keep to 5 minutes. Quality over quantity.'],donot:['Do not walk even one step on a tight lead.','Do not yank the lead.','Never use a retractable lead.'],tip:'💡 One person walking on a tight lead undoes a week of progress.'},
+  {id:'s_settle3',icon:'😌',bg:'#EEF2FF',num:'Session 3 · Settle',title:'Settle — Adding Duration',dur:'10 mins · once today',timerSecs:600,why:'Add the cue word "Settle" formally so it means something he can respond to anywhere.',outcome:'Goes to his mat and lies quietly for 1–2 minutes when you say "Settle."',steps:['Say "Settle" once calmly. Point toward the mat.','If he goes to the mat: drop a treat quietly.','Wait longer before next treat — build to 30 seconds between rewards.','If he stays: reward every 30 seconds with a quiet treat.','If he gets up: say nothing. When he returns: treat.'],donot:['Do not use his name to call him to the mat.','Do not praise excitedly — calm only.','Exercise him before settle practice.'],tip:'💡 5 minutes settle a day for 4 weeks builds the pub and café dog.'}
+],checklist:['Wait at every door today','Lead walking in garden','First outdoor walk (5 mins max)','Settle practice','Recall in garden'],behaviour:[{e:'🎉',title:'First real walks',desc:'Keep them very short. Let him sniff — sniffing is exhausting and enriching.'},{e:'🔊',title:'Barking starting',desc:'Normal. Calmly redirect his attention to you.'},{e:'💪',title:'Energy increasing',desc:'Zoomies are normal. Let him do it safely.'},{e:'🧪',title:'Testing recall outside',desc:'Keep outdoor treats very high value.'}],tips:['5-minute walk maximum','Stop the instant the lead tightens','Wait at every door, every meal'],focus:['Wait at doors','Loose lead in garden','Settle with duration']},
+
+{id:'w17',startW:17,endW:26,label:'4–6 Months',title:'Adolescence Begins',sub:'He may seem to forget commands. Stay consistent — this is where your work counts most.',warn:'If recall stops working outdoors, go back to the long line immediately.',sessions:[
+  {id:'s_stay',icon:'✋',bg:'#EEF2FF',num:'Session 1 · Commands',title:'Stay — Teaching from Zero',dur:'3 mins · 3× today',timerSecs:180,why:'Stay builds on sit and down. Teaches him to hold position even when you move away.',outcome:'Holds a sit-stay for 30 seconds with you 3 metres away.',steps:['Ask Barney to sit in a quiet room.','Say "Stay" once. Hold your palm toward him.','Take ONE step back. Pause 2 seconds. Step forward. "Yes!" and treat.','Do not call him to you — always walk back to reward.','Build: 1 step → 2 steps → 3 steps over several sessions.','Always release with a consistent word: "OK" or "Free."'],donot:['Do not call him out of stay to reward.','Do not add distance and duration at the same time.','One cue — do not repeat "stay."'],tip:'💡 Distance first. Then duration. Then distractions. In that order.'},
+  {id:'s_fetch',icon:'🎾',bg:'#FEF3E2',num:'Session 2 · Commands',title:'Fetch — Teaching from Zero',dur:'5 mins · 2× today',timerSecs:300,why:'Springers were bred to retrieve. Channelling this instinct builds impulse control and gives you a brilliant energy outlet.',outcome:'Chases a thrown toy, returns and drops it reliably.',steps:['Build toy drive: wiggle toy along floor. When he grabs it: brief tug, swap for treat.','Ask for sit. Throw the toy a short distance.','The moment he picks it up: back away excitedly, calling his name.','When he reaches you: hold a treat near his nose. He drops the toy. Say "Drop."','Pick up the toy. Sit. Throw again.','If he does not return: turn away and act uninterested.'],donot:['Never grab the toy — always trade.','Maximum 10 throws per session.','Do not skip sit before throw.'],tip:'💡 Trade, never grab. One rule, brilliant fetch.'},
+  {id:'s_settle4',icon:'😌',bg:'#EBF4FF',num:'Session 3 · Settle',title:'Settle — Proofing New Locations',dur:'10–15 mins · vary location today',timerSecs:900,why:'Settle is reliable at home. Now take the mat to new places — this is what makes it life-changing.',outcome:'Settles on mat in at least 3 different locations including outdoors.',steps:['Take his mat to a different room.','Place the mat down, say "Settle" calmly and wait.','Reward any interaction with the mat.','Build to 5 minutes settled before moving location.','Repeat in the garden — reward more frequently outdoors.','Carry the mat everywhere you go now.'],donot:['Do not jump to a busy environment — build gradually.','Do not reduce rewards in a new place — increase them.'],tip:'💡 Every time you sit somewhere new, put the mat down.'}
+],checklist:['Stay practice (3 sessions)','Fetch session','Settle in a new location','Long line recall outdoors','Walk with loose lead focus'],behaviour:[{e:'🙉',title:'Selective hearing',desc:'Not broken — he is a teenager. Keep outdoor rewards very high value.'},{e:'💪',title:'More energy',desc:'Fetch, nose work and training all count. Mental exercise tires as much as physical.'},{e:'😤',title:'Testing every boundary',desc:'Normal adolescence. Stay calm and consistent every time.'},{e:'🤝',title:'Deepening bond',desc:'Every session during adolescence is relationship-building.'}],tips:['Long line: one call, jackpot every outdoor return','Settle in 3 different places this week','Do not reduce training during adolescence'],focus:['Stay','Fetch','Settle in new locations']},
+
+{id:'w26',startW:26,endW:99,label:'6–12 Months',title:'Building the Adult Dog',sub:'Commands reliable at home. Proof everything in the real world — this is where it comes together.',warn:null,sessions:[
+  {id:'s_recall2',icon:'🐕',bg:'#EEF2FF',num:'Session 1 · Commands',title:'Off-Lead Recall — Proofing Outdoors',dur:'10–15 mins · secure area only',timerSecs:0,why:'Reliable off-lead recall is the result of months of consistent work. Keep jackpotting it forever.',outcome:'Returns immediately off lead in open spaces, around distractions, every time.',steps:['Only in fully secure, enclosed areas.','Long line on his harness. Let him drag it.','Let him get genuinely distracted.','Call "Barney, come!" once. Most exciting voice.','When he runs to you: back up to increase his speed.','When he reaches you: jackpot — 5–6 treats, huge praise.'],donot:['Never call twice.','Never punish a slow return.','Do not remove long line until recall is solid.'],tip:'💡 The long line keeps him safe while building the reliability that earns freedom.'},
+  {id:'s_settle5',icon:'☕',bg:'#FEF3E2',num:'Session 2 · Settle',title:'Settle in Public — Café or Pub',dur:'20–30 mins · a real visit',timerSecs:0,why:'This is what all those months of settle training built toward.',outcome:'Lies quietly under a table in a café or pub for 20+ minutes.',steps:['Choose a quiet venue on a quiet day.','Bring his mat and high-value treats.','Corner table away from the main flow.','Settle cue as he lies under the table.','Reward every 2 minutes with a quiet treat.','Build across visits: 10 → 20 → 30 → 60 minutes.'],donot:['Do not start in a noisy venue.','Do not allow him to greet everyone.','High-value treats matter more in public.'],tip:'💡 Start quiet. Build slowly. One good experience shapes the next ten.'},
+  {id:'s_scent',icon:'🔍',bg:'#F0FBF3',num:'Session 3 · Enrichment',title:'Scent Work — Find It',dur:'10–15 mins · garden or park',timerSecs:900,why:'Springers were bred for their nose. 10 minutes of nose work tires him more than a 2-mile run.',outcome:'Actively searches for and finds hidden treats using his nose.',steps:['Scatter 5–6 treats in the garden grass while he watches. "Find it!"','Celebrate each find.','Make it harder each round.','Progress: scatter while he is not watching.','Hide treats under plant pots, behind furniture.','Consider a local scentwork class.'],donot:['Do not show him where treats are.','Do 5–6 finds per session.'],tip:'💡 Bad weather days: hide treats around the house. 15 minutes = happily exhausted.'}
+],checklist:['Long line recall outdoors','Settle in a public place','Scent work session','Loose lead walk','Fetch session'],behaviour:[{e:'📈',title:'Commands sticking',desc:'The work from weeks 8–16 is showing. Keep training — it compounds.'},{e:'🏃',title:'High energy',desc:'1–2 hours of varied exercise daily now. Mix walks, fetch, scent work.'},{e:'🤝',title:'Deepening bond',desc:'The relationship built through training is paying off in how he looks to you.'},{e:'🎓',title:'Ready for classes',desc:'A local training class is excellent now — structured work around other dogs.'}],tips:['Jackpot every outdoor recall — forever','Take the mat to cafés, pubs, friends\' houses','Scent work on bad weather days'],focus:['Off-lead recall','Settle in public','Scent work']}
+];
+
+const milestones=[
+  {id:'m01',age:'By 9 weeks',t:'Responds to his name',d:'Turns to look reliably on first call'},
+  {id:'m02',age:'By 9 weeks',t:'First night in crate',d:'Slept in the crate (even imperfectly)'},
+  {id:'m03',age:'By 9 weeks',t:'First sling outing',d:'Out in the sling, stayed calm'},
+  {id:'m04',age:'By 9 weeks',t:'Settles near you calmly',d:'Lies down without constant attention-seeking'},
+  {id:'m05',age:'By 10 weeks',t:'Sits on verbal cue',d:'Sits when asked without a lure'},
+  {id:'m06',age:'By 10 weeks',t:'Leave it works',d:'Moves away from food on cue'},
+  {id:'m07',age:'By 10 weeks',t:'Crate 30 mins settled',d:'Calm in crate for 30 mins daytime'},
+  {id:'m08',age:'By 10 weeks',t:'Settles on mat',d:'Lies on mat for 30 seconds'},
+  {id:'m09',age:'By 10 weeks',t:'5 new experiences',d:'Positive exposure to 5 different things'},
+  {id:'m10',age:'By 12 weeks',t:'Down on cue',d:'Lies down when asked without physical help'},
+  {id:'m11',age:'By 12 weeks',t:'Recall in garden',d:'Comes every time when called in garden'},
+  {id:'m12',age:'By 12 weeks',t:'Sleeps through the night',d:'Full night without crying or waking'},
+  {id:'m13',age:'By 12 weeks',t:'10 socialisation experiences',d:'Positive exposure to 10+ different things'},
+  {id:'m14',age:'By 12 weeks',t:'Accepts full body handling',d:'Paws, ears, mouth and tail — all calm'},
+  {id:'m15',age:'By 13 weeks',t:'First walk outside 🎉',d:'First proper walk on the ground after vaccination'},
+  {id:'m16',age:'By 14 weeks',t:'Waits at every door',d:'Pauses at doors without pushing through'},
+  {id:'m17',age:'By 16 weeks',t:'Loose lead in garden',d:'Walks without pulling in the garden'},
+  {id:'m18',age:'By 16 weeks',t:'Settle on mat 2 mins',d:'Lies quietly on mat for 2 minutes'},
+  {id:'m19',age:'By 4 months',t:'1 hour alone calmly',d:'Settled without distress for 1 hour'},
+  {id:'m20',age:'By 6 months',t:'Stay 30 secs at 3 metres',d:'Holds stay for 30 seconds, 3 metres away'},
+  {id:'m21',age:'By 6 months',t:'Fetch with reliable drop',d:'Chases, returns and drops toy on cue'},
+  {id:'m22',age:'By 6 months',t:'Recall on long line',d:'Returns reliably on long line outdoors'},
+  {id:'m23',age:'By 6 months',t:'Settle on mat 5 mins',d:'Lies quietly on mat in different locations'},
+  {id:'m24',age:'By 6 months',t:'Loose lead on real walks',d:'Walks without pulling on proper walks'},
+  {id:'m25',age:'By 12 months',t:'Off-lead recall reliable',d:'Returns immediately off lead in open spaces'},
+  {id:'m26',age:'By 12 months',t:'Settled in public',d:'Calm in café, pub or vet for 20+ minutes'},
+  {id:'m27',age:'By 12 months',t:'All core commands solid',d:'Sit, down, stay, come, leave, wait, fetch, settle'},
+];
+
+// HELPERS
+function getCurrentStage(){const w=weeksOld();return stages.find(s=>w>=s.startW&&w<s.endW)||stages[stages.length-1];}
+function pick(k,btn,v){picks[k]=v;btn.closest('.rbs,.chips').querySelectorAll('button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
+
+// SHEET
+function openSheet(){
+  // Reset to first tab (crate) each time
+  document.querySelectorAll('.sheet-seg').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.sheet-form').forEach(f=>f.classList.remove('on'));
+  document.querySelector('.sheet-seg').classList.add('on');
+  document.getElementById('sf-crate').classList.add('on');
+  document.getElementById('sheetBg').classList.add('open');
+}
+function closeSheet(){document.getElementById('sheetBg').classList.remove('open');}
+function switchSeg(tab,btn){
+  document.querySelectorAll('.sheet-seg').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.sheet-form').forEach(f=>f.classList.remove('on'));
+  btn.classList.add('on');document.getElementById('sf-'+tab).classList.add('on');
+}
+
+// TIMER
+function startTimer(id,title,secs){
+  if(!secs)return;
+  timerTotal=secs;timerLeft=secs;
+  document.getElementById('timerName').textContent=title;
+  document.getElementById('timerMsg').textContent='';
+  updateTimer();
+  document.getElementById('timerBg').classList.add('open');
+  if(timerIv)clearInterval(timerIv);
+  timerIv=setInterval(()=>{timerLeft--;updateTimer();if(timerLeft<=0){clearInterval(timerIv);document.getElementById('timerMsg').textContent='✅ Time\'s up! Great session!';}},1000);
+}
+function updateTimer(){
+  const m=Math.floor(Math.abs(timerLeft)/60),s=Math.abs(timerLeft)%60;
+  document.getElementById('timerTime').textContent=`${m}:${s.toString().padStart(2,'0')}`;
+  document.getElementById('timerFill').style.width=`${Math.max(0,timerLeft/timerTotal*100)}%`;
+}
+function stopTimer(){if(timerIv)clearInterval(timerIv);closeTimer();}
+function closeTimer(){document.getElementById('timerBg').classList.remove('open');if(timerIv){clearInterval(timerIv);timerIv=null;}}
+
+// SAVES
+function saveCrate(){
+  if(!picks.cset){toast('How settled was he?');return;}
+  allData.crate.unshift({dur:document.getElementById('cDur').value,settled:picks.cset,notes:document.getElementById('cNote').value,who:currentUser,ts:Date.now()});
+  picks={};document.querySelectorAll('.chip.on').forEach(b=>b.classList.remove('on'));
+  document.getElementById('cNote').value='';
+  closeSheet();toast('🏠 Crate saved!');cloudSave();renderDash();
+}
+function saveOuting(){
+  const loc=document.getElementById('sLoc').value.trim();
+  if(!loc){toast('Where did you go?');return;}
+  if(!picks.sreact){toast('How did he react?');return;}
+  allData.social.unshift({loc,method:picks.smeth||'',reaction:picks.sreact,notes:document.getElementById('sNoteOut').value,who:currentUser,ts:Date.now()});
+  picks={};document.querySelectorAll('.rb.on,.chip.on').forEach(b=>b.classList.remove('on'));
+  document.getElementById('sLoc').value='';document.getElementById('sNoteOut').value='';
+  closeSheet();toast('🌍 Outing saved!');cloudSave();renderDash();
+}
+function markDone(id,title){
+  if(!allData.done)allData.done={};
+  const key=`${todayStr()}_${id}`;
+  const note=document.getElementById('note-'+id)?.value||'';
+  if(allData.done[key]){
+    delete allData.done[key];
+  } else {
+    allData.done[key]={who:currentUser,note,ts:Date.now()};
+    allData.sessions.unshift({actName:title,rating:'✓ Done',notes:note,who:currentUser,ts:Date.now()});
+    toast('✅ Done! Barney is doing great 🐾');
+    // Fix 4+12: auto-collapse after marking done
+    if(openSC.has(id)){
+      openSC.delete(id);
+      const detail=document.getElementById('scd-'+id);
+      const card=document.getElementById('sc-'+id);
+      const chev=card?card.querySelector('.sc-chev'):null;
+      if(detail)detail.classList.remove('open');
+      if(chev)chev.classList.remove('open');
+    }
+  }
+  cloudSave();renderToday();renderDash();
+}
+function tickCheck(label){
+  if(!allData.checklist)allData.checklist={};
+  const key=`${todayStr()}_cl_${label}`;
+  if(allData.checklist[key])delete allData.checklist[key];
+  else{allData.checklist[key]=true;toast('✓ Checked!');}
+  cloudSave();renderToday();
+}
+function logToilet(type){
+  if(!allData.toilet)allData.toilet={};
+  const key=todayStr();
+  if(!allData.toilet[key])allData.toilet[key]=[];
+  allData.toilet[key].push({type,time:fmt(Date.now()),ts:Date.now()});
+  cloudSave();renderToilet();
+  toast(type==='outside'?'✅ Outside! Good boy!':'💧 Accident logged');
+}
+function toggleMs(id){
+  if(allData.milestones[id]){
+    openMS.has(id)?openMS.delete(id):openMS.add(id);
+    const n=document.getElementById('msn-'+id);
+    if(n)n.classList.toggle('open',openMS.has(id));
+    return;
+  }
+  allData.milestones[id]={date:fmtD(Date.now()),who:currentUser,note:'',photo:''};
+  toast('🏆 Milestone achieved! 🎉');
+  openMS.add(id);
+  cloudSave();renderMilestones();renderDash();
+}
+function saveMsNote(id){const note=document.getElementById('msi-'+id)?.value||'';if(allData.milestones[id])allData.milestones[id].note=note;cloudSave();toast('📝 Note saved!');}
+function saveMsPhoto(id,input){
+  const file=input.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    if(allData.milestones[id])allData.milestones[id].photo=e.target.result;
+    cloudSave();renderMilestones();toast('📷 Photo saved!');
+  };
+  reader.readAsDataURL(file);
+}
+function removeMsPhoto(id){
+  if(allData.milestones[id])delete allData.milestones[id].photo;
+  cloudSave();renderMilestones();toast('Photo removed');
+}
+function removeMilestone(id){delete allData.milestones[id];openMS.delete(id);cloudSave();renderMilestones();renderDash();}
+
+// RENDER TODAY
+function renderToday(){
+  const stage=getCurrentStage();
+  document.getElementById('sbTag').textContent=`${stage.label} · ${ageLabel()}`;
+  document.getElementById('sbTitle').textContent=stage.title;
+  document.getElementById('sbSub').textContent=stage.sub;
+  const w=document.getElementById('sbWarn');
+  if(stage.warn){w.textContent='⚠️ '+stage.warn;w.style.display='block';}else w.style.display='none';
+  document.getElementById('tipText').textContent=getTip();
+
+  const iMap={Name:'👂',Crate:'🏠',Calm:'😌',Settle:'😌',Toilet:'🚽',Sling:'🌍',Recall:'🏃',Sit:'🐾',Down:'⬇️',Leave:'✋',Lead:'🦮',Walk:'👟',Wait:'🛑',Long:'🏃',Fetch:'🎾',Stay:'✋',Scent:'🔍',Overnight:'🌙',Handling:'🖐️',Outing:'🌍'};
+  // Fix 16: progress bar above sessions
+  const totalSess=stage.sessions.length;
+  const doneSess=stage.sessions.filter(s=>!!(allData.done||{})[`${todayStr()}_${s.id}`]).length;
+  const remaining=totalSess-doneSess;
+  const progPct=Math.round(doneSess/totalSess*100);
+  const progLabel=doneSess===totalSess?'🎉 All sessions done today! Great work.':doneSess===0?'Tap a session to get started':`${doneSess} done · ${remaining} to go`;
+  document.getElementById('sessionsEl').innerHTML=`<div class="sess-progress">
+    <div class="sess-prog-bar"><div class="sess-prog-fill" style="width:${progPct}%"></div></div>
+    <div class="sess-prog-label">${progLabel}</div>
+  </div>`+stage.sessions.map(s=>{
+    const key=`${todayStr()}_${s.id}`;const done=!!(allData.done||{})[key];const dd=(allData.done||{})[key];const open=openSC.has(s.id);
+    // Fix 5: "Tap to start" on collapsed cards
+    return`<div class="scard${done?' done':''}" id="sc-${s.id}">
+      <div class="sc-row" onclick="toggleSC('${s.id}')">
+        <div class="sc-icon" style="background:${s.bg}">${s.icon}</div>
+        <div class="sc-info">
+          <div class="sc-tag">${s.num}</div>
+          <div class="sc-name">${s.title}</div>
+          <div class="sc-dur">${done?'✓ Completed':s.dur}</div>
+        </div>
+        <div class="sc-right">
+          <div class="sc-tick">${done?'✓':''}</div>
+          <div class="sc-chev${open?' open':''}">▼</div>
+        </div>
+      </div>
+      <div class="sc-detail${open?' open':''}" id="scd-${s.id}">
+        <div class="sc-pad">
+          <!-- Fix 2: timer at top -->
+          <div class="sc-top-btns">
+            ${s.timerSecs?`<button class="btn-timer-top" onclick="startTimer('${s.id}','${s.title}',${s.timerSecs})">⏱ Start ${Math.floor(s.timerSecs/60)}-min timer</button>`:''}
+          </div>
+          <!-- Fix 14: steps first -->
+          <div class="sc-h" style="margin-top:14px">Step by step</div>
+          <div class="sc-steps">${s.steps.map((t,i)=>`<div class="sc-step"><div class="sc-stepn">${i+1}</div><div class="sc-stept">${t}</div></div>`).join('')}</div>
+          <div class="sc-tip" style="margin-top:12px">${s.tip}</div>
+          <!-- outcome, donot, why below fold -->
+          <div class="sc-secondary-toggle" onclick="toggleSecondary('${s.id}')">
+            <span id="sec-label-${s.id}">More detail ▼</span>
+          </div>
+          <div class="sc-secondary" id="sec-${s.id}">
+            <div class="sc-outcome"><div class="sc-outcome-tag">🎯 Expected outcome</div><div class="sc-outcome-text">${s.outcome}</div></div>
+            <div class="sc-h">❌ What NOT to do</div>
+            <div class="sc-donot"><ul>${s.donot.map(d=>`<li>${d}</li>`).join('')}</ul></div>
+            <div class="sc-h">Why this matters</div><div class="sc-why">${s.why}</div>
+          </div>
+          <!-- Fix 4: mark done with note -->
+          <textarea class="sc-note" id="note-${s.id}" placeholder="Quick note — how did it go?">${done&&dd?dd.note||'':''}</textarea>
+          <div class="sc-btns">
+            <button class="btn-done${done?' undo':''}" onclick="markDone('${s.id}','${s.title}')">${done?'✓ Done — tap to undo':'✓ Mark as done'}</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  renderToilet();
+
+  document.getElementById('checklistEl').innerHTML=stage.checklist.map(label=>{
+    const done=!!(allData.checklist||{})[`${todayStr()}_cl_${label}`];
+    const ik=Object.keys(iMap).find(k=>label.startsWith(k))||'📋';
+    return`<div class="cl-row${done?' done':''}" onclick="tickCheck('${label}')">
+      <div class="cl-icon">${iMap[ik]||'📋'}</div>
+      <div class="cl-label">${label}</div>
+      <div class="cl-tick">${done?'✓':''}</div>
+    </div>`;
+  }).join('');
+
+  // Fix 7: partner strip — show what other trainer has done today
+  const otherUser=currentUser==='Caroline'?'Darren':'Caroline';
+  const otherSess=(allData.sessions||[]).filter(s=>s.who===otherUser&&new Date(s.ts).toDateString()===todayStr());
+  const strip=document.getElementById('partnerStrip');
+  if(strip){
+    if(otherSess.length){
+      strip.style.display='block';
+      strip.innerHTML=`<strong>${otherUser==='Darren'?'👨 Darren':'👩 Caroline'}</strong> logged ${otherSess.length} session${otherSess.length>1?'s':''} today — ${otherSess.map(s=>s.actName).join(', ')}`;
+    } else {
+      strip.style.display='none';
+    }
+  }
+}
+
+function renderToilet(){
+  const entries=(allData.toilet||{})[todayStr()]||[];
+  const out=entries.filter(e=>e.type==='outside').length,acc=entries.filter(e=>e.type==='accident').length;
+  document.getElementById('ttCount').textContent=`${out} outside · ${acc} accident${acc!==1?'s':''}`;
+  document.getElementById('ttLog').innerHTML=entries.length?entries.map(e=>`<span style="margin-right:10px">${e.type==='outside'?'✅':'💧'} ${e.time}</span>`).join(''):'<span style="font-style:italic">No trips logged yet today</span>';
+}
+
+function toggleSecondary(id){
+  const sec=document.getElementById('sec-'+id);
+  const lbl=document.getElementById('sec-label-'+id);
+  if(!sec)return;
+  const open=sec.classList.toggle('open');
+  if(lbl)lbl.textContent=open?'Less detail ▲':'More detail ▼';
+}
+function logToiletSheet(type){
+  logToilet(type);
+  closeSheet();
+}
+function toggleSC(id){
+  const detail=document.getElementById('scd-'+id);
+  if(!detail)return;
+  const card=document.getElementById('sc-'+id);
+  const chev=card?card.querySelector('.sc-chev'):null;
+  if(openSC.has(id)){
+    openSC.delete(id);
+    detail.classList.remove('open');
+    if(chev)chev.classList.remove('open');
+  } else {
+    openSC.add(id);
+    detail.classList.add('open');
+    if(chev)chev.classList.add('open');
+  }
+}
+function toggleOC(){document.getElementById('ocDetail').classList.toggle('open');document.getElementById('ocChev').classList.toggle('open');}
+
+// RENDER PLAN
+function renderPlan(){
+  const w=weeksOld();let autoOpen=-1;
+  document.getElementById('planEl').innerHTML=stages.map((s,idx)=>{
+    const cur=w>=s.startW&&w<s.endW,past=w>=s.endW,next=!cur&&!past&&stages[stages.findIndex(x=>w>=x.startW&&w<x.endW)+1]===s;
+    if(cur)autoOpen=idx;
+    const cls=cur?'now':next?'next':past?'past':'';
+    const badge=cur?'YOU ARE HERE':past?'COMPLETED':next?'UP NEXT':`FROM WEEK ${s.startW}`;
+    const open=openSR.has(idx);
+    return`<div class="stage-card${cls?' '+cls:''}">
+      <div class="stage-row" onclick="toggleSR(${idx})">
+        <div class="stage-num">${past?'✓':s.startW}</div>
+        <div class="stage-info"><div class="stage-badge">${badge}</div><div class="stage-name">${s.title}</div><div class="stage-sub">${s.label}</div></div>
+        <div class="stage-chev${open?' open':''}" id="srchev-${idx}">▼</div>
+      </div>
+      <div class="stage-detail${open?' open':''}" id="srbody-${idx}">
+        <div class="sd-h">Focus — 3 daily sessions</div>
+        <div class="sd-pills">${s.sessions.map(ss=>`<span class="sd-pill">${ss.icon} ${ss.title}</span>`).join('')}</div>
+        <div class="sd-h" style="margin-top:12px">What to expect</div>
+        ${s.tips.map(t=>`<div class="sd-item key">✅ ${t}</div>`).join('')}
+        ${s.behaviour.slice(0,2).map(b=>`<div class="sd-item">${b.e} ${b.title}: ${b.desc}</div>`).join('')}
+        ${s.warn?`<div class="sd-warn">⚠️ ${s.warn}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+  if(autoOpen>=0){openSR.add(autoOpen);setTimeout(()=>{const b=document.getElementById('srbody-'+autoOpen);const c=document.getElementById('srchev-'+autoOpen);if(b)b.classList.add('open');if(c)c.classList.add('open');},80);}
+}
+function toggleSR(idx){const b=document.getElementById('srbody-'+idx);const c=document.getElementById('srchev-'+idx);if(!b)return;if(openSR.has(idx)){openSR.delete(idx);b.classList.remove('open');c&&c.classList.remove('open');}else{openSR.add(idx);b.classList.add('open');c&&c.classList.add('open');}}
+
+// RENDER DASH
+function renderDash(){
+  const sess=allData.sessions||[],cr=allData.crate||[],soc=allData.social||[],all=[...sess,...cr,...soc];
+  document.getElementById('pTot').textContent=all.length;
+  document.getElementById('pMs').textContent=Object.keys(allData.milestones||{}).length;
+  document.getElementById('pOut').textContent=soc.length;
+  document.getElementById('pCr').textContent=cr.length;
+
+  let streak=0;const today=new Date();today.setHours(0,0,0,0);
+  for(let i=0;i<365;i++){const d=new Date(today.getTime()-i*86400000),ds=d.toDateString();if(all.some(s=>new Date(s.ts).toDateString()===ds))streak++;else if(i>0)break;}
+  document.getElementById('streakNum').textContent=streak;
+  document.getElementById('streakSub').textContent=streak===0?'Train today to start your streak':streak===1?'First day — keep it going tomorrow!':`${streak} days in a row — Barney is lucky! 🌟`;
+
+  const days=['M','T','W','T','F','S','S'];const nd=new Date().getDay();
+  document.getElementById('wsDays').innerHTML=days.map((d,i)=>{
+    const off=i-((nd+6)%7),date=new Date(today.getTime()+off*86400000),ds=date.toDateString();
+    const has=all.some(s=>new Date(s.ts).toDateString()===ds);
+    return`<div class="wday"><div class="wday-l">${d}</div><div class="wday-dot${has?' has':''}${off===0?' today':''}">${has?'✓':''}</div></div>`;
+  }).join('');
+
+  const todayAll=[...sess,...cr,...soc].filter(s=>new Date(s.ts).toDateString()===todayStr());
+  const pl=document.getElementById('partnerLog');
+  const hasAny=todayAll.length>0;
+  if(!hasAny){
+    pl.innerHTML=`<div style="padding:8px 0;font-size:14px;color:var(--t3);font-style:italic">No sessions logged yet today — be the first!</div>`;
+  } else {
+    pl.innerHTML=['Caroline','Darren'].map(who=>{
+      const mine=todayAll.filter(s=>s.who===who);
+      return`<div class="pc-row"><div class="pc-who">${who==='Caroline'?'👩':'👨'} ${who}</div>
+        <div>${mine.length?mine.map(s=>'actName' in s?`<div class="pc-sess">🎓 ${s.actName}</div>`:'dur' in s?`<div class="pc-sess">🏠 Crate — ${s.dur}</div>`:`<div class="pc-sess">🌍 ${s.loc}</div>`).join(''):''}</div>
+        ${!mine.length?`<div class="pc-none" style="font-style:italic;font-size:14px;color:var(--t3)">Nothing logged yet</div>`:''}</div>`;
+    }).join('');
+  }
+
+  // Fix 10: warmer history summary
+  const todaySess=sess.filter(s=>new Date(s.ts).toDateString()===todayStr()&&s.rating==='✓ Done');
+  const stage=getCurrentStage();
+  const totalToday=stage.sessions.length;
+  const doneToday=stage.sessions.filter(s=>!!(allData.done||{})[`${todayStr()}_${s.id}`]).length;
+  const summaryEl=document.getElementById('dashSummary');
+  if(summaryEl){
+    if(doneToday===0) summaryEl.textContent='No sessions logged yet today. Open the Today tab to get started!';
+    else if(doneToday===totalToday) summaryEl.textContent=`🎉 All ${totalToday} sessions done today — Barney is lucky to have you!`;
+    else summaryEl.textContent=`${doneToday} of ${totalToday} sessions done today. ${totalToday-doneToday} to go!`;
+  }
+
+  const recent=[...sess.map(s=>({...s,k:'s'})),...cr.map(s=>({...s,k:'c'})),...soc.map(s=>({...s,k:'o'}))].sort((a,b)=>b.ts-a.ts).slice(0,12);
+  const rEl=document.getElementById('recentLog');
+  if(!recent.length){rEl.innerHTML=`<div class="empty"><div class="ei">📋</div><p>Start logging to see history</p></div>`;return;}
+  rEl.innerHTML=recent.map(s=>{
+    const name=s.k==='s'?`🎓 ${s.actName} — ${s.rating}`:s.k==='c'?`🏠 Crate — ${s.dur} — ${s.settled}`:`🌍 ${s.loc} — ${s.reaction}`;
+    const col=s.k==='s'?'var(--ind-mid)':s.k==='c'?'var(--gdark)':'var(--bdark)';
+    return`<div class="log-item" style="border-left-color:${col}">
+      <div class="li-meta">${fmtDT(s.ts)}</div>
+      <div class="li-name">${name}</div>
+      ${s.notes?`<div class="li-note">${s.notes}</div>`:''}
+      <span class="li-who ${s.who==='Caroline'?'wc':'wd'}">${s.who==='Caroline'?'👩':'👨'} ${s.who}</span>
+    </div>`;
+  }).join('');
+}
+
+// RENDER MILESTONES
+function renderMilestones(){
+  const groups={};milestones.forEach(m=>{if(!groups[m.age])groups[m.age]=[];groups[m.age].push(m);});
+  const done=Object.keys(allData.milestones||{}).length,total=milestones.length;
+  document.getElementById('msCount').textContent=`${done} / ${total}`;
+  document.getElementById('msBar').style.width=`${total?Math.round(done/total*100):0}%`;
+  document.getElementById('msEl').innerHTML=Object.entries(groups).map(([age,items])=>`
+    <div class="ms-group">${age}</div>
+    ${items.map(m=>{
+      const a=(allData.milestones||{})[m.id],nopen=openMS.has(m.id);
+      return`<div class="ms-card${a?' done':''}">
+        <div class="ms-tap" onclick="toggleMs('${m.id}')">
+          <div class="ms-check">${a?'✓':''}</div>
+          <div style="flex:1;min-width:0">
+            <div class="ms-t">${m.t}</div>
+            <div class="ms-d">${m.d}</div>
+            ${a?`<div class="ms-date">✅ ${a.date} · ${a.who==='Caroline'?'👩':'👨'} ${a.who}</div>`:''}
+          </div>
+          ${a&&a.photo?`<img src="${a.photo}" class="ms-thumb" alt="">`:''}
+        </div>
+        ${a?`<div class="ms-expand${nopen?' open':''}" id="msn-${m.id}">
+          <input type="file" accept="image/*" class="ms-photo-input" id="msphoto-${m.id}" onchange="saveMsPhoto('${m.id}',this)">
+          <div class="ms-photo-zone" onclick="document.getElementById('msphoto-${m.id}').click()">
+            ${a.photo
+              ?`<img src="${a.photo}" alt="photo">`
+              :`<div class="ms-photo-zone-empty"><span>📷</span><p>Add photo</p></div>`
+            }
+          </div>
+          <div class="ms-note-col">
+            <textarea class="ms-ta" id="msi-${m.id}" placeholder="How did it happen?">${a.note||''}</textarea>
+            <div class="ms-action-row">
+              <button class="ms-save" onclick="saveMsNote('${m.id}')">Save</button>
+              <button class="ms-remove" onclick="removeMilestone('${m.id}')">Remove</button>
+            </div>
+          </div>
+        </div>`:''}
+      </div>`;
+    }).join('')}
+  `).join('');
+}
+
+// BUILD SELECT
+// NAV
+function goPage(name,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.ntab').forEach(b=>b.classList.remove('on'));
+  document.getElementById('page-'+name).classList.add('on');
+  btn.classList.add('on');
+  window.scrollTo({top:0,behavior:'instant'});
+}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);}
+
+// SHOW APP
+function showApp(){
+  document.getElementById('hdr').style.display='flex';
+  document.getElementById('app').style.display='block';
+  document.getElementById('nav').classList.add('visible');
+  document.getElementById('syncBar').style.display='block';
+  document.getElementById('fab').style.display='flex';
+  document.getElementById('apill').textContent=ageLabel();
+  document.getElementById('upill').textContent=currentUser==='Caroline'?'👩 Caroline':'👨 Darren';
+  document.getElementById('hdate').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+  renderToday();renderPlan();renderDash();renderMilestones();fetchAIChallenge();
+}
+
+// AI DAILY CHALLENGE
+async function fetchAIChallenge(){
+  const el=document.getElementById('aiChallenge');
+  if(!el)return;
+  const cacheKey=`barney_ai_challenge_${todayStr()}`;
+
+  // Check shared cache first — render instantly if available
+  try{
+    if(hasCloudStorage()){
+      const cached=await window.storage.get(cacheKey,true);
+      if(cached&&cached.value){renderAICard(JSON.parse(cached.value));return;}
+    } else {
+      const local=localStorage.getItem(cacheKey);
+      if(local){renderAICard(JSON.parse(local));return;}
+    }
+  }catch{}
+
+  // Not cached — fetch silently in background, card appears when ready
+
+  // Build context for the prompt
+  const stage=getCurrentStage();
+  const ageW=weeksOld();
+  const yesterday=new Date(Date.now()-86400000).toDateString();
+  const yesterdaySess=(allData.sessions||[]).filter(s=>new Date(s.ts).toDateString()===yesterday);
+  const yesterdayNames=yesterdaySess.length?yesterdaySess.map(s=>s.actName).join(', '):'nothing logged';
+
+  const prompt=`You are a professional puppy trainer helping Caroline and Darren train their English Springer Spaniel puppy called Barney (liver and white). Barney is ${ageW} weeks old and arrived home today at 8 weeks.
+
+Current training stage: ${stage.title} (${stage.label})
+Stage focus: ${stage.focus.join(', ')}
+Yesterday's completed sessions: ${yesterdayNames}
+
+Generate ONE short, practical daily bonus challenge for today. It must:
+- Be different from the 3 core sessions already in their plan (${stage.sessions.map(s=>s.title).join(', ')})
+- Build naturally on what was done yesterday
+- Be achievable in under 5 minutes
+- Be warm, encouraging and specific to Barney at ${ageW} weeks old
+- NOT repeat advice already in the core sessions
+
+Respond with ONLY valid JSON — no markdown, no backticks, no preamble:
+{"emoji":"<single emoji>","title":"<short challenge title, max 8 words>","body":"<2-3 sentences: what to do and why it helps Barney right now>"}`;
+
+  const fallback={emoji:'🐾',title:'Practice name recognition in a new room',body:'Take Barney to a room you haven\'t trained in yet. Say his name once and reward the look immediately. New environments make the lesson stick far better.'};
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:300,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    const data=await resp.json();
+    console.log('[AI Challenge] API response:',JSON.stringify(data).slice(0,300));
+    if(!data.content){console.warn('[AI Challenge] No content in response');renderAICard(fallback);return;}
+    const raw=data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+    const clean=raw.replace(/```json|```/g,'').trim();
+    const parsed=JSON.parse(clean);
+    try{
+      if(hasCloudStorage()){await window.storage.set(cacheKey,JSON.stringify(parsed),true);}
+      else{localStorage.setItem(cacheKey,JSON.stringify(parsed));}
+    }catch{}
+    renderAICard(parsed);
+  }catch(e){
+    console.error('[AI Challenge] Error:',e);
+    renderAICard(fallback);
+  }
+}
+
+function renderAICard(data){
+  const el=document.getElementById('aiChallenge');
+  if(!el)return;
+  el.innerHTML=`<div class="ai-card">
+    <div class="ai-label">✨ Daily Challenge <span>AI</span></div>
+    <div class="ai-title">${data.emoji} ${data.title}</div>
+    <div class="ai-body">${data.body}</div>
+  </div>`;
+}
+
+async function init(){
+  loadLocal();
+  try{await cloudLoad();}catch{}
+  document.getElementById('splash').style.opacity='0';
+  setTimeout(()=>document.getElementById('splash').style.display='none',350);
+  if(currentUser)showApp();
+  else document.getElementById('login').style.display='flex';
+}
+init();
+</script>
+</body>
+</html>
