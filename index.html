@@ -182,7 +182,29 @@ body{background:var(--bg);font-family:'Inter',system-ui,sans-serif;color:var(--t
 .btn-done{flex:1;padding:15px;border:none;border-radius:var(--r2);background:var(--ind);color:#fff;font-family:'Inter',sans-serif;font-size:16px;font-weight:700;cursor:pointer;}
 .btn-done.undo{background:var(--bg);color:var(--t2);border:1px solid var(--sep);}
 
-/* TOILET */
+/* TOILET PATTERN */
+.tp-card{background:var(--card);border-radius:var(--r);padding:20px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,.07);}
+.tp-title{font-size:16px;font-weight:700;margin-bottom:4px;}
+.tp-sub{font-size:13px;color:var(--t3);margin-bottom:16px;}
+.tp-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;}
+.tp-stat{background:var(--bg);border-radius:var(--r2);padding:12px;text-align:center;}
+.tp-stat-n{font-size:24px;font-weight:800;line-height:1;margin-bottom:3px;}
+.tp-stat-l{font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.3px;}
+.tp-chart{margin-bottom:14px;}
+.tp-chart-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--t3);margin-bottom:8px;}
+.tp-bars{display:flex;gap:3px;align-items:flex-end;height:48px;}
+.tp-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;height:100%;}
+.tp-bar-track{flex:1;width:100%;background:var(--bg);border-radius:4px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;}
+.tp-bar-out{background:var(--green);border-radius:4px;transition:height .3s;}
+.tp-bar-acc{background:var(--red);border-radius:4px;opacity:.6;}
+.tp-bar-l{font-size:9px;font-weight:600;color:var(--t3);text-transform:uppercase;}
+.tp-insight{background:var(--ind-bg);border-radius:var(--r2);padding:12px 14px;font-size:14px;color:var(--ind3);line-height:1.55;}
+.tp-empty{text-align:center;padding:16px;color:var(--t3);font-size:14px;font-style:italic;}
+.tp-hour-row{display:flex;gap:2px;margin-bottom:4px;}
+.tp-hour-cell{flex:1;height:8px;border-radius:2px;background:var(--bg);}
+.tp-hour-cell.has-out{background:var(--green);}
+.tp-hour-cell.has-acc{background:var(--red);}
+.tp-hour-labels{display:flex;justify-content:space-between;font-size:9px;color:var(--t3);font-weight:600;}
 .toilet{background:var(--card);border-radius:var(--r);overflow:hidden;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.07);}
 .toilet-head{padding:16px 18px;border-bottom:1px solid var(--sep);display:flex;justify-content:space-between;align-items:center;}
 .toilet-title{font-size:16px;font-weight:600;}
@@ -511,6 +533,7 @@ textarea{resize:vertical;min-height:60px;}
     <div class="stat"><div class="stat-n" id="pCr" style="color:var(--t2)">0</div><div class="stat-l">Crate logs</div></div>
   </div>
   <div class="week-card"><div class="week-title">This week</div><div class="week-days" id="wsDays"></div></div>
+  <div class="tp-card"><div class="tp-title">🚽 Toilet Patterns</div><div class="tp-sub">Tap the tracker on Today to build this up</div><div id="toiletPattern"></div></div>
   <div class="partner-card"><div class="pc-title">Today — both trainers</div><div id="partnerLog"></div></div>
   <div class="hist-card"><div class="hist-title">Recent history</div><div id="recentLog"></div></div>
   <button onclick="exportCSV()" style="width:100%;padding:14px;border:1px solid var(--sep);border-radius:var(--r2);background:var(--card);font-family:'Inter',sans-serif;font-size:15px;font-weight:600;color:var(--t2);cursor:pointer;margin-top:4px;">⬇️ Export all data as CSV</button>
@@ -852,7 +875,7 @@ function logToilet(type){
   const key=todayStr();
   if(!allData.toilet[key])allData.toilet[key]=[];
   allData.toilet[key].push({type,time:fmt(Date.now()),ts:Date.now()});
-  cloudSave();renderToilet();
+  cloudSave();renderToilet();renderToiletPattern();
   toast(type==='outside'?'✅ Outside! Good boy!':'💧 Accident logged');
 }
 function toggleMs(id){
@@ -1040,8 +1063,89 @@ function renderPlan(){
 }
 function toggleSR(idx){const b=document.getElementById('srbody-'+idx);const c=document.getElementById('srchev-'+idx);if(!b)return;if(openSR.has(idx)){openSR.delete(idx);b.classList.remove('open');c&&c.classList.remove('open');}else{openSR.add(idx);b.classList.add('open');c&&c.classList.add('open');}}
 
+// TOILET PATTERN
+function renderToiletPattern(){
+  const el=document.getElementById('toiletPattern');
+  if(!el)return;
+  const toilet=allData.toilet||{};
+  const allEntries=Object.entries(toilet).flatMap(([day,entries])=>(entries||[]).map(e=>({...e,day})));
+  if(!allEntries.length){el.innerHTML=`<div class="tp-empty">No toilet trips logged yet — start tapping the tracker on Today!</div>`;return;}
+
+  // Today stats
+  const todayEntries=(toilet[todayStr()]||[]);
+  const todayOut=todayEntries.filter(e=>e.type==='outside').length;
+  const todayAcc=todayEntries.filter(e=>e.type==='accident').length;
+
+  // All-time ratio
+  const totalOut=allEntries.filter(e=>e.type==='outside').length;
+  const totalAcc=allEntries.filter(e=>e.type==='accident').length;
+  const successRate=totalOut+totalAcc>0?Math.round(totalOut/(totalOut+totalAcc)*100):0;
+
+  // Average gap between outside trips (mins)
+  const outsideTs=allEntries.filter(e=>e.type==='outside'&&e.ts).map(e=>e.ts).sort((a,b)=>a-b);
+  let avgGap=null;
+  if(outsideTs.length>1){
+    const gaps=outsideTs.slice(1).map((t,i)=>t-outsideTs[i]);
+    const meanMs=gaps.reduce((a,b)=>a+b,0)/gaps.length;
+    avgGap=Math.round(meanMs/60000);
+  }
+
+  // 7-day bar chart
+  const today=new Date();today.setHours(0,0,0,0);
+  const days7=Array.from({length:7},(_,i)=>{
+    const d=new Date(today.getTime()-(6-i)*86400000);
+    const ds=d.toDateString();
+    const entries=toilet[ds]||[];
+    return{label:['S','M','T','W','T','F','S'][d.getDay()],out:entries.filter(e=>e.type==='outside').length,acc:entries.filter(e=>e.type==='accident').length,isToday:i===6};
+  });
+  const maxVal=Math.max(...days7.map(d=>d.out+d.acc),1);
+
+  // Hour heatmap (which hours have most accidents)
+  const hourAcc=Array(24).fill(0),hourOut=Array(24).fill(0);
+  allEntries.forEach(e=>{
+    if(e.ts){const h=new Date(e.ts).getHours();if(e.type==='accident')hourAcc[h]++;else hourOut[h]++;}
+  });
+  const worstHour=hourAcc.indexOf(Math.max(...hourAcc));
+  const bestHour=hourOut.indexOf(Math.max(...hourOut));
+
+  // Insight text
+  let insight='';
+  if(avgGap&&avgGap<120){insight=`Barney needs out roughly every <strong>${avgGap} minutes</strong> on average. `;}
+  if(totalAcc>0&&worstHour!==undefined&&hourAcc[worstHour]>0){insight+=`Most accidents happen around <strong>${worstHour}:00–${worstHour+1}:00</strong> — worth a proactive trip then.`;}
+  else if(successRate===100){insight=`Perfect score so far — every trip has been outside! Keep the routine tight. 🎉`;}
+  else if(successRate>=80){insight=`${successRate}% success rate — Barney is getting it. Stay consistent with the routine.`;}
+
+  el.innerHTML=`
+    <div class="tp-stats">
+      <div class="tp-stat"><div class="tp-stat-n" style="color:var(--green)">${todayOut}</div><div class="tp-stat-l">Outside today</div></div>
+      <div class="tp-stat"><div class="tp-stat-n" style="color:var(--red)">${todayAcc}</div><div class="tp-stat-l">Accidents today</div></div>
+      <div class="tp-stat"><div class="tp-stat-n" style="color:var(--ind)">${successRate}%</div><div class="tp-stat-l">Success rate</div></div>
+    </div>
+    <div class="tp-chart">
+      <div class="tp-chart-title">Last 7 days</div>
+      <div class="tp-bars">
+        ${days7.map(d=>{
+          const total=d.out+d.acc||0;
+          const outPct=total?Math.round(d.out/maxVal*100):0;
+          const accPct=total?Math.round(d.acc/maxVal*100):0;
+          return`<div class="tp-bar-wrap">
+            <div class="tp-bar-track">
+              ${d.acc?`<div class="tp-bar-acc" style="height:${accPct}%"></div>`:''}
+              ${d.out?`<div class="tp-bar-out" style="height:${outPct}%"></div>`:''}
+            </div>
+            <div class="tp-bar-l" style="${d.isToday?'color:var(--ind);':'}'}">${d.label}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+    ${avgGap?`<div style="font-size:13px;color:var(--t3);margin-bottom:10px;">Avg gap between outside trips: <strong style="color:var(--t2)">${avgGap < 60 ? avgGap+'m' : Math.floor(avgGap/60)+'h '+(avgGap%60)+'m'}</strong></div>`:''}
+    ${insight?`<div class="tp-insight">${insight}</div>`:''}
+  `;
+}
+
 // RENDER DASH
 function renderDash(){
+  renderToiletPattern();
   const sess=allData.sessions||[],cr=allData.crate||[],soc=allData.social||[],all=[...sess,...cr,...soc];
   document.getElementById('pTot').textContent=all.length;
   document.getElementById('pMs').textContent=Object.keys(allData.milestones||{}).length;
