@@ -1166,81 +1166,84 @@ function showApp(){
   renderToday();renderPlan();renderDash();renderMilestones();fetchAIChallenge();
 }
 
-// AI DAILY CHALLENGE
-async function fetchAIChallenge(){
+// DAILY CHALLENGES — static, rotates by day of week, specific to each stage
+const dailyChallenges={
+  w8:[
+    {emoji:'🤲',title:'Hand feeding at floor level',body:'Feed a third of Barney\'s meal by hand, sitting on the floor with him. This builds trust and teaches him your hands are always good news — the foundation of everything.'},
+    {emoji:'👃',title:'Let him sniff you properly',body:'Sit still and let Barney sniff your hands, feet and clothes for 2 minutes without reaching to stroke him. Letting him investigate on his terms builds enormous confidence.'},
+    {emoji:'🧸',title:'Introduce one new texture',body:'Put a small piece of bubble wrap, a rubber mat or a crinkly bag on the floor. Let him investigate at his own pace. Reward any brave sniff or paw touch with a quiet "yes" and treat.'},
+    {emoji:'🔔',title:'Marker word practice',body:'Say "Yes!" in a bright voice then immediately give a treat — 10 times in a row with no other training. You\'re teaching him that "Yes!" means a treat is coming. This makes every future session more effective.'},
+    {emoji:'🧺',title:'Crate game — toss and walk away',body:'Toss a treat into the crate and immediately walk away before he comes back out. Don\'t watch him. Repeat 5 times. Teaching him the crate is rewarding even when you\'re not hovering.'},
+    {emoji:'👐',title:'Gentle handling practice',body:'While he\'s calm, slowly touch his paws, ears and mouth for 1 second each — one treat per body part. Keep it brief. This builds the calm handling he\'ll need at the vet for the rest of his life.'},
+    {emoji:'🌿',title:'Garden sniff walk',body:'Take Barney into the garden on a loose lead and follow him wherever his nose goes for 5 minutes. Don\'t direct him. Pure sniff time tires a puppy more than you\'d expect and builds confidence outdoors.'},
+  ],
+  w10:[
+    {emoji:'🔄',title:'Sit in three different spots',body:'Practice sit in the kitchen, hallway and garden today — 3 reps each. Commands learned in one place often don\'t transfer automatically. Barney needs to learn "sit means sit everywhere."'},
+    {emoji:'🎯',title:'Leave it with a toy',body:'Place one of his toys on the floor and say "leave it." Reward backing away. You\'ve been practising with food — generalising to toys is the next step and much harder for a Springer.'},
+    {emoji:'🏃',title:'Recall from another room',body:'Let Barney wander into another room, then call him once in your most exciting voice. Huge reward when he arrives. Short distance recall indoors is the foundation of outdoor recall later.'},
+    {emoji:'⏱️',title:'Settle — build to 60 seconds',body:'Place his mat down and reward him every 15 seconds for staying on it. Aim for 60 seconds total today. The mat settle only becomes useful when it has real duration behind it.'},
+    {emoji:'🧠',title:'Name game at distance',body:'Move to the far end of the room before saying his name. Reward the look. Increasing distance makes name recognition more reliable when it really matters — like at the park.'},
+    {emoji:'🤝',title:'Sit before everything today',body:'Ask for a sit before every meal, treat, lead clip and door opening today. Just once, calmly. This teaches Barney that sitting politely is the way to get everything good — without a single "no."'},
+    {emoji:'🪣',title:'Leave it — moving treat',body:'Roll a treat slowly across the floor and say "leave it." Reward with a different treat. Moving food is far harder to resist than a stationary fist — this is a real-world skill.'},
+  ],
+  w12:[
+    {emoji:'🏃',title:'Recall chase game',body:'Run away from Barney in the garden as fast as you can, calling his name as you go. When he catches you: jackpot of 5 treats. Running away triggers his chase instinct — one of the most powerful recall-builders there is.'},
+    {emoji:'⬇️',title:'Down from standing',body:'You\'ve been practising down from a sit. Today try luring him into a down directly from standing. It\'s harder but builds a stronger, faster response when you need it quickly.'},
+    {emoji:'🧊',title:'Frozen Kong prep tonight',body:'Tonight, stuff a Kong with kibble, peanut butter and a bit of banana and freeze it. Use it in tomorrow\'s crate session. A frozen Kong buys 20 minutes of calm — the most effective crate tool you have.'},
+    {emoji:'🌍',title:'Sling outing — focus on one thing',body:'On today\'s sling outing, pick one specific thing to socialise — a pushchair, a cyclist, a noisy van. Watch his body language. Ears forward and curious is ideal. Tense and still means more distance needed.'},
+    {emoji:'👂',title:'Name game with distraction',body:'Practice name recognition while the TV is on or someone else is in the room. He knows his name in a quiet room — now proof it against mild distractions. This is where the skill becomes real.'},
+    {emoji:'🦷',title:'Chew rotation today',body:'Swap out Barney\'s current chew for a frozen carrot or a different texture. Rotating chews keeps them interesting and satisfies his teething urge. A busy mouth means less biting of everything else.'},
+    {emoji:'🚪',title:'Wait at every door today',body:'Practice a 3-second wait at every door you go through together today. Just sit, say "wait," open the door, then release with "OK." You\'re not training — you\'re building a lifelong reflex.'},
+  ],
+  w14:[
+    {emoji:'🦮',title:'Direction change walk',body:'On your 5-minute walk today, change direction every 20 seconds without warning. No verbal cue — just turn. He has to watch you to know where you\'re going. This is loose lead training disguised as a fun walk.'},
+    {emoji:'🛑',title:'Wait at the car door',body:'Before Barney gets in or out of the car today, ask for a wait. Hold it for 5 seconds. Car door manners are a safety habit — a dog that launches out of a car can be killed. Start the habit now.'},
+    {emoji:'😌',title:'Settle during a meal',body:'Put his mat down while you eat a meal and say "settle." Reward every 30 seconds he stays. A dog who settles during mealtimes becomes the dog you can take to restaurants. This is that habit starting.'},
+    {emoji:'🌳',title:'Sniff walk — let him lead',body:'Today\'s walk is entirely on his terms. Follow his nose. Stop every time he wants to sniff. A 5-minute sniff walk is more mentally tiring than a 20-minute march — and a tired Springer is a good Springer.'},
+    {emoji:'🎾',title:'Chase instinct — don\'t fetch yet',body:'Roll a ball away from Barney and let him chase it — but don\'t ask him to bring it back yet. You\'re building toy drive, which you\'ll need for fetch later. End the game while he still wants more.'},
+    {emoji:'🚶',title:'Heel position — 10 steps',body:'Hold a treat at your left hip and walk 10 steps. Reward at the end. You\'re not teaching formal heel — just planting the idea that walking beside you is very rewarding. 3 repetitions maximum.'},
+    {emoji:'🏠',title:'Crate — door closed, you leave the room',body:'Kong in crate, door closed — then leave the room for 2 minutes. Come back calmly. This is a big step toward alone time. Keep it short and successful rather than long and stressful.'},
+  ],
+  w17:[
+    {emoji:'📍',title:'Long line recall — one chance only',body:'On the long line today, call Barney once. If he doesn\'t come, walk toward him — don\'t repeat the command. One cue, one chance. Repeating teaches him the first call is optional.'},
+    {emoji:'🏠',title:'Settle in a new room',body:'Take his mat somewhere you haven\'t used it before — the bedroom, a friend\'s hallway, the car. Place it down, say "settle," reward generously. The mat only becomes powerful when it works everywhere.'},
+    {emoji:'🎾',title:'Fetch — practise the drop',body:'Focus entirely on the drop today. When he returns with the toy, show a treat at his nose before he reaches you. The moment he drops: treat and immediate throw again. The throw is the reward — not just the treat.'},
+    {emoji:'🧠',title:'Nose work — scatter feed',body:'Scatter his entire dinner in the garden grass and say "find it." Watch him work. 10 minutes of nose work tires a Springer more than a 2-mile run. His brain needs this kind of exercise as much as his body.'},
+    {emoji:'🛑',title:'Stay — add distance today',body:'You\'ve been building duration. Today add one extra step of distance. Walk 4 steps back, pause 5 seconds, walk back and reward. Never call him out of stay — always return to him to reward.'},
+    {emoji:'🌍',title:'New environment settle',body:'Take the mat somewhere genuinely new — a car park, a friend\'s garden, outside a shop. Reward every 20 seconds he stays settled. New places are harder — increase your reward rate to match.'},
+    {emoji:'💪',title:'Adolescent patience drill',body:'Ask for a sit. Wait 10 full seconds before rewarding. Then ask for a down. Wait 10 seconds. Adolescent Springers need impulse control practice daily. Calm, slow rewards build a calmer dog.'},
+  ],
+  w26:[
+    {emoji:'☕',title:'Café settle — new venue',body:'Take his mat to somewhere you haven\'t visited before. Corner table, away from foot traffic. Reward every 2 minutes he stays settled. Each successful new venue makes the next one easier.'},
+    {emoji:'🐕',title:'Off-lead recall — add distraction',body:'In your secure area today, recall him when he\'s genuinely distracted by a smell or sound. That\'s the real test. Jackpot every single return — this habit must never be allowed to weaken.'},
+    {emoji:'🔍',title:'Hide and seek nose work',body:'Hide 6 small treats around one room while Barney waits outside. Let him in and say "find it." When he\'s good at one room, use two. 15 minutes of this and he\'ll sleep for hours.'},
+    {emoji:'🦮',title:'Loose lead in a new place',body:'Take a walk somewhere new today — different street, different park. New environments make dogs pull more. Same rules: stop the instant the lead tightens. One step on a tight lead is one step too many.'},
+    {emoji:'🤝',title:'Meet another dog — controlled',body:'Arrange a calm, on-lead greeting with a known friendly dog. Watch Barney\'s body language. Loose and wiggly is ideal. Stiff and still means create more distance. Keep it under 30 seconds.'},
+    {emoji:'🧘',title:'Settle while you\'re on the phone',body:'Put his mat down, say "settle," then have a real phone conversation for 10 minutes. Ignore him completely unless he gets up. Real-life distractions are the final proof of a trained settle.'},
+    {emoji:'🎓',title:'Run through all core commands',body:'Sit, down, stay, come, leave it, wait, fetch, settle — one rep each in a single 5-minute session. Not drilling — just checking. If one feels rusty, that\'s what to focus on this week.'},
+  ],
+};
+
+function getDailyChallenge(){
+  const stage=getCurrentStage();
+  const challenges=dailyChallenges[stage.id]||dailyChallenges.w8;
+  // Rotate by day number since DOB so it changes daily and is consistent between users
+  const dayNum=Math.floor((Date.now()-DOB.getTime())/86400000);
+  return challenges[dayNum%challenges.length];
+}
+
+function fetchAIChallenge(){
   const el=document.getElementById('aiChallenge');
   if(!el)return;
-  const cacheKey=`barney_ai_challenge_${todayStr()}`;
-
-  // Check shared cache first — render instantly if available
-  try{
-    if(hasCloudStorage()){
-      const cached=await window.storage.get(cacheKey,true);
-      if(cached&&cached.value){renderAICard(JSON.parse(cached.value));return;}
-    } else {
-      const local=localStorage.getItem(cacheKey);
-      if(local){renderAICard(JSON.parse(local));return;}
-    }
-  }catch{}
-
-  // Not cached — fetch silently in background, card appears when ready
-
-  // Build context for the prompt
-  const stage=getCurrentStage();
-  const ageW=weeksOld();
-  const yesterday=new Date(Date.now()-86400000).toDateString();
-  const yesterdaySess=(allData.sessions||[]).filter(s=>new Date(s.ts).toDateString()===yesterday);
-  const yesterdayNames=yesterdaySess.length?yesterdaySess.map(s=>s.actName).join(', '):'nothing logged';
-
-  const prompt=`You are a professional puppy trainer helping Caroline and Darren train their English Springer Spaniel puppy called Barney (liver and white). Barney is ${ageW} weeks old and arrived home today at 8 weeks.
-
-Current training stage: ${stage.title} (${stage.label})
-Stage focus: ${stage.focus.join(', ')}
-Yesterday's completed sessions: ${yesterdayNames}
-
-Generate ONE short, practical daily bonus challenge for today. It must:
-- Be different from the 3 core sessions already in their plan (${stage.sessions.map(s=>s.title).join(', ')})
-- Build naturally on what was done yesterday
-- Be achievable in under 5 minutes
-- Be warm, encouraging and specific to Barney at ${ageW} weeks old
-- NOT repeat advice already in the core sessions
-
-Respond with ONLY valid JSON — no markdown, no backticks, no preamble:
-{"emoji":"<single emoji>","title":"<short challenge title, max 8 words>","body":"<2-3 sentences: what to do and why it helps Barney right now>"}`;
-
-  const fallback={emoji:'🐾',title:'Practice name recognition in a new room',body:'Take Barney to a room you haven\'t trained in yet. Say his name once and reward the look immediately. New environments make the lesson stick far better.'};
-  try{
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:300,
-        messages:[{role:'user',content:prompt}]
-      })
-    });
-    const data=await resp.json();
-    console.log('[AI Challenge] API response:',JSON.stringify(data).slice(0,300));
-    if(!data.content){console.warn('[AI Challenge] No content in response');renderAICard(fallback);return;}
-    const raw=data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
-    const clean=raw.replace(/```json|```/g,'').trim();
-    const parsed=JSON.parse(clean);
-    try{
-      if(hasCloudStorage()){await window.storage.set(cacheKey,JSON.stringify(parsed),true);}
-      else{localStorage.setItem(cacheKey,JSON.stringify(parsed));}
-    }catch{}
-    renderAICard(parsed);
-  }catch(e){
-    console.error('[AI Challenge] Error:',e);
-    renderAICard(fallback);
-  }
+  const challenge=getDailyChallenge();
+  renderAICard(challenge);
 }
 
 function renderAICard(data){
   const el=document.getElementById('aiChallenge');
   if(!el)return;
   el.innerHTML=`<div class="ai-card">
-    <div class="ai-label">✨ Daily Challenge <span>AI</span></div>
+    <div class="ai-label">✨ Daily Challenge</div>
     <div class="ai-title">${data.emoji} ${data.title}</div>
     <div class="ai-body">${data.body}</div>
   </div>`;
