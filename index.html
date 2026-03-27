@@ -77,7 +77,8 @@ body{background:var(--bg);font-family:'Inter',system-ui,sans-serif;color:var(--t
 #nav{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--sep);display:none;padding-bottom:max(env(safe-area-inset-bottom),8px);z-index:90;}
 #nav.visible{display:flex;}
 .ntab{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 4px 7px;background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:11px;font-weight:500;color:var(--t3);gap:3px;position:relative;transition:color .12s;}
-.ntab .ni{font-size:23px;line-height:1;}
+.ntab .ni{font-size:23px;line-height:1;width:24px;height:24px;display:flex;align-items:center;justify-content:center;}
+.ntab .ni svg{width:24px;height:24px;}
 .ntab.on{color:var(--ind);}
 .ntab.on::after{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:32px;height:3px;background:var(--ind);border-radius:0 0 4px 4px;}
 
@@ -449,7 +450,7 @@ textarea{resize:vertical;min-height:60px;}
     <div class="sb-warn" id="sbWarn" style="display:none"></div>
   </div>
   <div class="tip-card">
-    <div class="tip-icon">💡</div>
+    <div class="tip-icon"><svg width="26" height="26" viewBox="0 0 26 26" fill="none"><circle cx="13" cy="10" r="6" fill="var(--ind)" opacity=".15"/><path d="M13 4a6 6 0 0 1 3 11.2V17a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-1.8A6 6 0 0 1 13 4z" fill="var(--ind)"/><rect x="10" y="19" width="6" height="1.5" rx=".75" fill="var(--ind)"/><rect x="10.5" y="21.5" width="5" height="1.5" rx=".75" fill="var(--ind)"/></svg></div>
     <div><div class="tip-label">Tip of the day</div><div class="tip-text" id="tipText"></div></div>
   </div>
   <div id="aiChallenge"></div>
@@ -459,8 +460,8 @@ textarea{resize:vertical;min-height:60px;}
   <div class="toilet">
     <div class="toilet-head"><div class="toilet-title">Tap each time Barney goes</div><div class="toilet-count" id="ttCount">0 outside · 0 accidents</div></div>
     <div class="toilet-btns">
-      <button class="toilet-btn out" onclick="logToilet('outside')"><span class="ti">✅</span><span class="tl">Outside</span></button>
-      <button class="toilet-btn acc" onclick="logToilet('accident')"><span class="ti">💧</span><span class="tl">Accident</span></button>
+      <button class="toilet-btn out" onclick="logToilet('outside')"><span class="ti"><svg width="30" height="30" viewBox="0 0 30 30" fill="none"><circle cx="15" cy="15" r="11" fill="#34C759" opacity=".15"/><path d="M9 15l4 4 8-8" stroke="#1A7A34" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="tl">Outside</span></button>
+      <button class="toilet-btn acc" onclick="logToilet('accident')"><span class="ti"><svg width="30" height="30" viewBox="0 0 30 30" fill="none"><ellipse cx="15" cy="20" rx="8" ry="4" fill="#007AFF" opacity=".2"/><path d="M15 6 Q18 11 20 15 Q22 19 15 22 Q8 19 10 15 Q12 11 15 6Z" fill="#007AFF" opacity=".7"/></svg></span><span class="tl">Accident</span></button>
     </div>
     <div class="toilet-log" id="ttLog"></div>
   </div>
@@ -468,17 +469,17 @@ textarea{resize:vertical;min-height:60px;}
   <div class="checklist" id="checklistEl"></div>
   <div class="partner-strip" id="partnerStrip" style="display:none"></div>
   <div class="milestone-prompt" onclick="goPage('wins',document.querySelector('.ntab:last-child'))">
-    <span class="mp-icon">🏆</span>
+    <span class="mp-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M6 2h10v8a5 5 0 0 1-10 0V2z" fill="var(--ind)" opacity=".2" stroke="var(--ind)" stroke-width="1.5"/><path d="M6 5H3a2 2 0 0 0 2 2" stroke="var(--ind)" stroke-width="1.5" stroke-linecap="round"/><path d="M16 5h3a2 2 0 0 1-2 2" stroke="var(--ind)" stroke-width="1.5" stroke-linecap="round"/><line x1="11" y1="15" x2="11" y2="18" stroke="var(--ind)" stroke-width="1.5" stroke-linecap="round"/><line x1="7" y1="20" x2="15" y2="20" stroke="var(--ind)" stroke-width="1.8" stroke-linecap="round"/></svg></span>
     <span class="mp-text">Did Barney nail something today? Log a milestone →</span>
   </div>
 </div>
 
 <div class="page" id="page-plan">
-  <div class="plan-hero"><h2>📋 Training Plan</h2><p>8 weeks to 12 months — every stage mapped. Current stage highlighted.</p></div>
-  <div class="sec">🌙 Overnight Guidance</div>
+  <div class="plan-hero"><h2>Training Plan</h2><p>8 weeks to 12 months — every stage mapped. Current stage highlighted.</p></div>
+  <div class="sec">Overnight Guidance</div>
   <div class="overnight">
     <div class="oc-row" onclick="toggleOC()">
-      <div class="oc-icon">🌙</div>
+      <div class="oc-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z" fill="var(--bdark)" opacity=".8"/></svg></div>
       <div style="flex:1"><div class="oc-label">Crate &amp; Sleep Guide</div><div class="oc-title">Sleeping Through the Night</div><div class="oc-sub">Week by week — what to expect</div></div>
       <div class="oc-chev" id="ocChev">▼</div>
     </div>
@@ -550,22 +551,34 @@ textarea{resize:vertical;min-height:60px;}
 </div><!-- /app -->
 
 <nav id="nav">
-  <button class="ntab on" onclick="goPage('today',this)"><span class="ni">☀️</span>Today</button>
-  <button class="ntab" onclick="goPage('plan',this)"><span class="ni">📋</span>Training Plan</button>
-  <button class="ntab" onclick="goPage('dash',this)"><span class="ni">📊</span>Dashboard</button>
-  <button class="ntab" onclick="goPage('wins',this)"><span class="ni">🏆</span>Milestones</button>
+  <button class="ntab on" onclick="goPage('today',this)">
+    <span class="ni"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M17.66 6.34l-1.41 1.41M6.34 17.66l-1.41 1.41" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+    Today
+  </button>
+  <button class="ntab" onclick="goPage('plan',this)">
+    <span class="ni"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="3" width="16" height="18" rx="2" fill="currentColor" opacity=".15"/><rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" stroke-width="1.8"/><line x1="8" y1="8" x2="16" y2="8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="8" y1="12" x2="16" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="8" y1="16" x2="13" y2="16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+    Plan
+  </button>
+  <button class="ntab" onclick="goPage('dash',this)">
+    <span class="ni"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="12" width="5" height="9" rx="1.5" fill="currentColor"/><rect x="9.5" y="7" width="5" height="14" rx="1.5" fill="currentColor"/><rect x="16" y="3" width="5" height="18" rx="1.5" fill="currentColor"/></svg></span>
+    Dashboard
+  </button>
+  <button class="ntab" onclick="goPage('wins',this)">
+    <span class="ni"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l2.7 7.4H22l-6.4 4.6 2.4 7.4L12 17l-6 4.4 2.4-7.4L2 9.4h7.3z" fill="currentColor"/></svg></span>
+    Milestones
+  </button>
 </nav>
 
-<button id="fab" onclick="openSheet()">+</button>
+<button id="fab" onclick="openSheet()"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><line x1="14" y1="5" x2="14" y2="23" stroke="white" stroke-width="2.5" stroke-linecap="round"/><line x1="5" y1="14" x2="23" y2="14" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg></button>
 
 <div class="sheet-bg" id="sheetBg" onclick="if(event.target===this)closeSheet()">
   <div class="sheet">
     <div class="sheet-handle"></div>
     <h3>Quick Log</h3>
     <div class="sheet-segs">
-      <button class="sheet-seg on" onclick="switchSeg('crate',this)">🏠 Crate</button>
-      <button class="sheet-seg" onclick="switchSeg('outing',this)">🌍 Outing</button>
-      <button class="sheet-seg" onclick="switchSeg('toilet',this)">🚽 Toilet</button>
+      <button class="sheet-seg on" onclick="switchSeg('crate',this)">Crate</button>
+      <button class="sheet-seg" onclick="switchSeg('outing',this)">Outing</button>
+      <button class="sheet-seg" onclick="switchSeg('toilet',this)">Toilet</button>
     </div>
     <div class="sheet-form on" id="sf-crate">
       <div class="fg"><div class="fl">Duration</div>
@@ -573,10 +586,10 @@ textarea{resize:vertical;min-height:60px;}
       </div>
       <div class="fg"><div class="fl">How settled?</div>
         <div class="chips">
-          <button class="chip" onclick="pick('cset',this,'😴 Settled')">😴 Settled</button>
-          <button class="chip" onclick="pick('cset',this,'😐 Restless')">😐 Restless</button>
-          <button class="chip" onclick="pick('cset',this,'😢 Crying')">😢 Crying</button>
-          <button class="chip" onclick="pick('cset',this,'🚨 Distressed')">🚨 Distressed</button>
+          <button class="chip" onclick="pick('cset',this,'Settled')">Settled</button>
+          <button class="chip" onclick="pick('cset',this,'Restless')">Restless</button>
+          <button class="chip" onclick="pick('cset',this,'Crying')">Crying</button>
+          <button class="chip" onclick="pick('cset',this,'Distressed')">Distressed</button>
         </div>
       </div>
       <div class="fg"><div class="fl">Note</div><textarea id="cNote" placeholder="e.g. settled after 5 mins..."></textarea></div>
@@ -587,17 +600,17 @@ textarea{resize:vertical;min-height:60px;}
       <div class="fg"><div class="fl">Where?</div><input type="text" id="sLoc" placeholder="e.g. garden centre, town..."></div>
       <div class="fg"><div class="fl">Method</div>
         <div class="chips">
-          <button class="chip" onclick="pick('smeth',this,'🎽 Sling')">🎽 Sling</button>
-          <button class="chip" onclick="pick('smeth',this,'🤲 Carried')">🤲 Carried</button>
-          <button class="chip" onclick="pick('smeth',this,'🦮 Lead')">🦮 Lead</button>
-          <button class="chip" onclick="pick('smeth',this,'🐕 Off lead')">🐕 Off lead</button>
+          <button class="chip" onclick="pick('smeth',this,'Sling')">Sling</button>
+          <button class="chip" onclick="pick('smeth',this,'Carried')">Carried</button>
+          <button class="chip" onclick="pick('smeth',this,'Lead')">Lead</button>
+          <button class="chip" onclick="pick('smeth',this,'Off lead')">Off lead</button>
         </div>
       </div>
       <div class="fg"><div class="fl">His reaction</div>
         <div class="rbs">
-          <button class="rb" onclick="pick('sreact',this,'😎 Confident')">😎 Confident</button>
-          <button class="rb" onclick="pick('sreact',this,'🔍 Curious')">🔍 Curious</button>
-          <button class="rb" onclick="pick('sreact',this,'😟 Nervous')">😟 Nervous</button>
+          <button class="rb" onclick="pick('sreact',this,'Confident')">Confident</button>
+          <button class="rb" onclick="pick('sreact',this,'Curious')">Curious</button>
+          <button class="rb" onclick="pick('sreact',this,'Nervous')">Nervous</button>
         </div>
       </div>
       <div class="fg"><div class="fl">Note</div><textarea id="sNoteOut" placeholder="How did he handle it?"></textarea></div>
